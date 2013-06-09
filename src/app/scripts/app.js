@@ -7,6 +7,10 @@ angular.module('msgr', [])
 		templateUrl: 'views/index.html',
 		controller: 'IndexController'
 	})
+	.when('/login', {
+		templateUrl: 'views/login.html',
+		controller: 'LoginController'
+	})
 	.otherwise({
 		templateUrl: 'views/404.html'
 	});

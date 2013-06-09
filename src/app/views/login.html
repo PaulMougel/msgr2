@@ -1,0 +1,16 @@
+<div ng-controller="LoginController">
+	<div class="row-fluid header">
+		<form ng-submit="getLog()">
+			<fieldset>
+				<label>
+					<input type="text" placeholder="Username" ng-model="username" required class="input-large" />
+				</label>
+				<label>
+					<input placeholder="Password" ng-model="password" required type="password" class="input-large" />
+				</label>
+
+				<button type="submit" class="btn btn-primary input-large">Login</button>
+			</fieldset>
+		</form>
+	</div>
+</div>
