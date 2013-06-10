@@ -10,11 +10,11 @@ angular.module('msgr')
         outlines = xmlDoc.getElementsByTagName("outline");
         var feeds, i;
         for (i = 0; i < outlines.length; i += 1) {
-            if (outlines[i].attributes.xmlUrl && outlines[i].attributes.htmlUrl && outlines[i].attributes.type.nodeValue === "rss") { // is a feed
-                console.log(">>> [" + outlines[i].attributes.title.nodeValue + "](" + outlines[i].attributes.xmlUrl.nodeValue + ")");
-            } else { // is a folder
-                console.log(outlines[i].attributes.title.nodeValue);
-            }
+          if (outlines[i].attributes.xmlUrl && outlines[i].attributes.htmlUrl && outlines[i].attributes.type.nodeValue === "rss") { // is a feed
+              console.log(">>> [" + outlines[i].attributes.title.nodeValue + "](" + outlines[i].attributes.xmlUrl.nodeValue + ")");
+          } else { // is a folder
+              console.log(outlines[i].attributes.title.nodeValue);
+          }
         }
       }
     };
