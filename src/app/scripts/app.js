@@ -1,17 +1,20 @@
 'use strict';
 
-angular.module('msgr', [])
+angular.module('msgr', ['xml'])
 .config(['$routeProvider', function ($routeProvider) {
 	$routeProvider
 	.when('/', {
-		templateUrl: 'views/index.html',
-		controller: 'IndexController'
-	})
-	.when('/login', {
 		templateUrl: 'views/login.html',
 		controller: 'LoginController'
+	})
+	.when('/stories/', {
+		templateUrl: 'views/stories.html',
+		controller: 'AtomController'
 	})
 	.otherwise({
 		templateUrl: 'views/404.html'
 	});
-}]);
+}])
+.config(function ($httpProvider) {
+    $httpProvider.responseInterceptors.push('xmlHttpInterceptor');
+});

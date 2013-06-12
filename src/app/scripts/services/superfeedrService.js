@@ -4,7 +4,7 @@ angular.module('msgr')
   .factory('superfeedrService', function ($rootScope, $http) {
     // Service logic
     // ...
-    var baseUrl = "http://readerapi.superfeedr.com";
+    var baseUrl = "https://readerapi.superfeedr.com";
     var token = "";
 
     function addAuthorizationHeader(headers) {
@@ -57,11 +57,20 @@ angular.module('msgr')
             return str.join("&");
           },
           data: {s: "feed/" + feed_url, ac: "subscribe"}
-        })
+        });
+      },
+      atom: function(url, n) {
+        if (!url) {
+          url = "http://www.engadget.com/rss.xml";
+        }
+        return $http({
+          method: "GET",
+          url: baseUrl + "/reader/atom/feed/" + url,
+          headers: addAuthorizationHeader(),
+        });
       },
       registerToken: function (data) {
         token = _.last(data.split("=")).trim();
-        console.log(token);
       }
     };
   });
