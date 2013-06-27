@@ -1,6 +1,8 @@
-<div class="row" ng-controller="AtomController">
+<div ng-controller="AtomController">
     <div class="row" ng-repeat="story in stories">
-        <h1 class="story-title">{{story.title}}</h1>
-        <div class="story-content" ng-bind-html-unsafe="story.content"></div>
+        <div class="large-offset-1 large-10 columns">
+            <h1 class="story-title">{{story.title}}</h1>
+            <div class="story-content" ng-bind-html-unsafe="story.content"></div>
+        </div>
     </div>
 </div>
