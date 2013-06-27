@@ -10,7 +10,8 @@
     "angular-sanitize": "~1.0.5",
     "foundation": "~v4.2.3",
     "angular-xml": "~0.1.1",
-    "underscore": "~1.4.4"
+    "underscore": "~1.4.4",
+    "pouchdb-nightly": "http://download.pouchdb.com/pouchdb-nightly.min.js"
   },
   "devDependencies": {
     "angular-mocks": "~1.0.5",
