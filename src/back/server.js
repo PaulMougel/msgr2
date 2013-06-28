@@ -1,4 +1,4 @@
-var db = require('./couch-wrapper');
+var db = require("./couch-wrapper");
 
 var express = require("express");
 var crypto = require("crypto");
@@ -17,9 +17,9 @@ app.all("*", function (request, response, next) {
             response.set("Access-Control-Allow-Credentials", "true");
             response.set("Access-Control-Allow-Methods", "PUT, PATCH, DELETE");
             response.set("Access-Control-Allow-Headers", "accept, access-control-allow-credentials, x-requested-with, origin, content-type");
-			response.send(200);
+			return response.send(200);
 		} else {
-			response.send(400);
+			return response.send(400);
 		}
 
 	} else {
