@@ -47,7 +47,7 @@ app.post("/users/signup", function (request, response) {
 			console.log(data);
 			response.send(201);
 		}, function (error) {
-			response.status(403).send(error);
+			response.status(403).send(error.message);
 		});
 	} else {
 		response.send(400);

@@ -20,7 +20,7 @@ signup({
         console.log(err.message); // JSON message thrown by CouchDB
     }
 )
-``
+```
 
 ### User management
 
@@ -37,7 +37,7 @@ Available functions:
 
 ## REST API
 
-'server.js' provides the REST API, exposed by the back-end.
+`server.js` provides the REST API, exposed by the back-end.
 This API is JSON-friendly : this means that all request bodies should be encoded as json and `Content-Type` header set to `application/json`.
 
 ### CORS
