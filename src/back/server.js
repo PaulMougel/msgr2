@@ -1,26 +1,78 @@
-var express = require('express');
-var app = express();
+var db = require('./couch-wrapper');
 
-app.all('*', function(request, response, next) {
+var express = require("express");
+var crypto = require("crypto");
+
+var app = express();
+var users = [];
+
+app.use(express.bodyParser());
+
+/* implement CORS */
+app.all("*", function (request, response, next) {
   	if (request.method === "OPTIONS") {
-		if (request.headers.origin) {
-            response.setHeader("Access-Control-Allow-Origin", request.headers.origin);
-            response.setHeader("Access-Control-Allow-Credentials", "true");
-            response.setHeader("Access-Control-Allow-Methods", "PUT, PATCH, DELETE");
-            response.setHeader("Access-Control-Allow-Headers", "accept, access-control-allow-credentials, x-requested-with, origin, content-type");
-			response.writeHead(200, "OK");
+  		// set cors headers for preflight request
+		if (request.get("Origin")) {
+            response.set("Access-Control-Allow-Origin", request.get("Origin"));
+            response.set("Access-Control-Allow-Credentials", "true");
+            response.set("Access-Control-Allow-Methods", "PUT, PATCH, DELETE");
+            response.set("Access-Control-Allow-Headers", "accept, access-control-allow-credentials, x-requested-with, origin, content-type");
+			response.send(200);
 		} else {
-			response.writeHead(400, "Bad Request");
+			response.send(400);
 		}
 
 	} else {
-		// add CORS headers
-		if (request.headers.origin) {
-            response.setHeader("Access-Control-Allow-Origin", request.headers.origin);
-            response.setHeader("Access-Control-Allow-Credentials", "true");
+		// set CORS headers for actual request
+		if (request.get("Origin")) {
+            response.set("Access-Control-Allow-Origin", request.get("Origin"));
+            response.set("Access-Control-Allow-Credentials", "true");
         }
     }
   	next();
  });
 
+/* sign-in */
+app.post("/users/signin", function (request, response) {
+	response.send(501);
+});
+
+/* sign-up */
+app.post("/users/signup", function (request, response) {
+	if (request.body.login && request.body.password) {
+		db.signup({
+			login: request.body.login,
+			password: request.body.password
+		}).then(function (data) {
+			console.log(data);
+			response.send(201);
+		}, function (error) {
+			response.status(403).send(error);
+		});
+	} else {
+		response.send(400);
+	}
+});
+
+/* get user info, including unread count */
+app.get("/user", function (request, response) {
+	response.send(501);
+});
+
+/* get feeds the logged user subscribed to */
+app.get("/user/feeds", function (request, response) {
+	response.send(501);
+});
+
+/* get feed's last stories */
+app.get("/feeds/:feed", function (request, response) {
+	response.send(501);
+});
+
+/* subscribe to a feed */
+app.put("/user/feeds/:feed_url", function (request, response) {
+	response.send(501);
+});
+
 app.listen(3000);
+console.log('Express started on port 3000');
