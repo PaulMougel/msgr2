@@ -24,7 +24,7 @@ signup({
 
 ### User management
 
-Here is the format of a user:
+User format:
 ```
 {
     login: 'foo',
@@ -33,8 +33,24 @@ Here is the format of a user:
 ```
 
 Available functions:
-- `signup(user)`, where the password is plaintext (will be hashed by the function)
-- `signin(user)`, where the password is plaintext (will be hashed by the function). If the signin is successful, returns a user object (without the password field).
+- `signup({login:'foo', password:'bar'})`, where the password is plaintext (will be hashed by the function)
+- `signin({login:'foo', password:'bar'})`, where the password is plaintext (will be hashed by the function). If the signin is successful, returns a user object (without the password field).
+
+### Subscriptions management
+
+Subscription format:
+```
+{
+    _id,
+    title,
+    description,
+    link, // Link to website
+    xmlUrl // RSS URL
+}
+```
+
+Available functions:
+- `addSubscription({login}, {title, description, link, xmlUrl})`
 
 ## REST API
 

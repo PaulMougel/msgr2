@@ -71,15 +71,17 @@ function hash(text) {
 function signup(user) {
     user.type = 'user';
     user.password = hash(user.password);
+    user.subscriptions = [];
+
     return doPUT(user.login, user);
 }
 
 function signin(user) {
     return doGET(user.login)
     .then(
-        function (data) {
-            if (data.password === hash(user.password)) {
-                return {login: data.login};
+        function (user) {
+            if (user.password === hash(user.password)) {
+                return {login: user.login};
             }
             else {
                 throw new Error(('Wrong login'));
@@ -88,5 +90,18 @@ function signin(user) {
     );
 }
 
+function addSubscription(user, feed) {
+    feed.type = 'feed';
+
+    return doGET(user.login)
+    .then(
+        function (user) {
+            user.subscriptions.push(feed);
+            return doPUT(user.login, user);
+        }
+    );
+}
+
 exports.signup = signup;
 exports.signin = signin;
+exports.addSubscription = addSubscription;
