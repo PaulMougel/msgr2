@@ -34,6 +34,7 @@ Here is the format of a user:
 
 Available functions:
 - `signup(user)`, where the password is plaintext (will be hashed by the function)
+- `login(user)`, where the password is plaintext (will be hashed by the function). If the login is successful, returns a user object (without the password field).
 
 ## REST API
 
