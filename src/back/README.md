@@ -34,3 +34,29 @@ Here is the format of a user:
 
 Available functions:
 - `signup(user)`
+
+## REST API
+
+'server.js' provides the REST API, exposed by the back-end.
+This API is JSON-friendly : this means that all request bodies should be encoded as json and `Content-Type` header set to `application/json`.
+
+### CORS
+
+It supports cross origin resource sharing as documented [here](http://www.w3.org/TR/cors/).
+
+### User management
+
+#### Sign-up
+
+    POST /users/signup
+
+### Input (request json body)
+
+ * login
+  * *Required* **string**
+ * password
+  * *Required* **string**
+
+### Response
+
+Status: 201 Created
