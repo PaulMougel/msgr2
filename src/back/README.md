@@ -154,6 +154,11 @@ Status: 200 OK
 
     POST /feeds/:feed_url
 
+##### Parameter
+
+ * feed_url
+  * *Required* **string**
+
 ##### Response
 
 ```json
@@ -169,3 +174,16 @@ Status: 200 OK
 ```
 
 Status: 200 OK
+
+#### Subscribe to a feed
+
+    PUT /user/feeds/:feed_url
+
+##### Parameter
+
+ * feed_url
+  * *Required* **string**
+
+##### Response
+
+Status: 204 No Content
