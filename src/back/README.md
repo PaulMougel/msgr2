@@ -28,20 +28,21 @@ User format:
 ```
 {
     login: 'foo',
-    password: 'bar'
+    password: 'bar',
+    subscriptions: [list of subscriptions]
 }
 ```
 
 Available functions:
 - `signup({login:'foo', password:'bar'})`, where the password is plaintext (will be hashed by the function)
-- `signin({login:'foo', password:'bar'})`, where the password is plaintext (will be hashed by the function). If the signin is successful, returns a user object (without the password field).
+- `signin({login:'foo', password:'bar'})`, where the password is plaintext (will be hashed by the function)
+- `getUser({login: 'foo'}) will return a user's informations (minus the password field)
 
 ### Subscriptions management
 
 Subscription format:
 ```
 {
-    _id,
     title,
     description,
     link, // Link to website

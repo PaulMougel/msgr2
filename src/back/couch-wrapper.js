@@ -67,6 +67,14 @@ function hash(text) {
     return crypto.createHash("sha512").update(text, "utf8").digest("hex");
 }
 
+function cleanUser(user) {
+    delete user._id;
+    delete user._rev;
+    delete user.type;
+    delete user.password;
+    return user;
+}
+
 // Public API
 function signup(user) {
     user.type = 'user';
@@ -81,11 +89,20 @@ function signin(user) {
     .then(
         function (user) {
             if (user.password === hash(user.password)) {
-                return {login: user.login};
+                return cleanUser(user);
             }
             else {
                 throw new Error(('Wrong login'));
             }
+        }
+    );
+}
+
+function getUser(user) {
+    return doGET(user.login)
+    .then(
+        function (user) {
+            return cleanUser(user);
         }
     );
 }
@@ -102,6 +119,17 @@ function addSubscription(user, feed) {
     );
 }
 
+function addSubscription(user, feed) {
+    return doGET(user.login)
+    .then(
+        function (user) {
+            user.subscriptions.push(feed);
+            return doPUT(user.login, user);
+        }
+    );
+}
+
 exports.signup = signup;
 exports.signin = signin;
+exports.getUser = getUser;
 exports.addSubscription = addSubscription;
