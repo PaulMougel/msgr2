@@ -5,7 +5,7 @@ angular.module('msgr')
         $scope.foundation();
 
         $scope.signin = function() {
-            var user = { login: $scope.email, password: $scope.password };
+            var user = { login: $scope.login, password: $scope.password };
             
             authService.signin(user)
             .success(function() {
@@ -17,7 +17,7 @@ angular.module('msgr')
         };
 
         $scope.signup = function() {
-            var user = { login: $scope.email, password: $scope.password };
+            var user = { login: $scope.login, password: $scope.password };
             
             authService.signup(user)
             .success(function() {
