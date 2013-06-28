@@ -140,4 +140,4 @@ exports.signin = signin;
 exports.getUser = getUser;
 exports.addSubscription = addSubscription;
 
-signin({login:'pmol', password:'bra'}).then(function(d) {console.log(d)}, function(d) {console.log(d)});
+//signin({login:'pmol', password:'bra'}).then(function(d) {console.log(d)}, function(d) {console.log(d)});

@@ -68,14 +68,14 @@ It supports cross origin resource sharing as documented [here](http://www.w3.org
 
     POST /users/signup
 
-### Input
+##### Input
 
  * login
   * *Required* **string**
  * password
   * *Required* **string**
 
-### Response
+##### Response
 
 Status: 201 Created
 
@@ -83,13 +83,89 @@ Status: 201 Created
 
     POST /users/signin
 
-### Input
+##### Input
 
  * login
   * *Required* **string**
  * password
   * *Required* **string**
 
-### Response
+##### Response
+
+```json
+{
+  "login": "kikoo",
+  "subscriptions": [
+    {
+      "title": "LinuxFr.org : les journaux",
+      "description": null,
+      "link": "http://linuxfr.org/journaux",
+      "xmlUrl": "http://linuxfr.org/journaux.atom"
+    }
+  ]
+}
+```
+
+Status: 200 OK
+Set-Cookie: token=*your_secret_token*
+
+#### Get authenticated user
+
+    GET /user
+
+##### Response
+
+```json
+{
+  "login": "kikoo",
+  "subscriptions": [
+    {
+      "title": "LinuxFr.org : les journaux",
+      "description": null,
+      "link": "http://linuxfr.org/journaux",
+      "xmlUrl": "http://linuxfr.org/journaux.atom"
+    }
+  ]
+}
+```
+
+Status: 200 OK
+
+#### Get authenticated user's subscriptions
+
+    GET /user/feeds
+
+##### Response
+
+```json
+[
+  {
+    "title": "LinuxFr.org : les journaux",
+    "description": null,
+    "link": "http://linuxfr.org/journaux",
+    "xmlUrl": "http://linuxfr.org/journaux.atom"
+  }
+]
+```
+
+Status: 200 OK
+
+#### Get subscription stories
+
+    POST /feeds/:feed_url
+
+##### Response
+
+```json
+[
+        {
+        "title": "Test de la Manjaro Linux",
+        "description": "*some html document*",
+        "link": "http://linuxfr.org/users/eqfm/journaux/test-de-la-manjaro-linux",
+        "pubdate": "2013-06-26T13:48:58.000Z",
+        "guid": "tag:linuxfr.org,2005:Diary/34047"
+    }
+]
+```
 
 Status: 200 OK

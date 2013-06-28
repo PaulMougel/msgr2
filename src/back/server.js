@@ -1,11 +1,14 @@
 var db = require("./couch-wrapper");
+var feed = require("./feed-wrapper");
 
 var express = require("express");
 var crypto = require("crypto");
 
 var app = express();
 var users = [];
+users.token = "kikoo";
 
+app.use(express.cookieParser());
 app.use(express.bodyParser());
 
 /* implement CORS */
@@ -38,8 +41,10 @@ app.post("/users/signin", function (request, response) {
 		db.signin({
 			login: request.body.login,
 			password: request.body.password
-		}).then(function (data) {
-			response.send(200);
+		}).then(function (user) {
+			response.cookie('token', user.token, {maxAge: 900000});
+			response.status(200).send(user);
+			users[user.token] = user.login;
 		}, function (error) {
 			response.status(401).send(error.message);
 		});
@@ -66,22 +71,63 @@ app.post("/users/signup", function (request, response) {
 
 /* get user info, including unread count */
 app.get("/user", function (request, response) {
-	response.send(501);
+	if (users[request.cookies.token]) {
+		db.getUser({login: users[request.cookies.token]})
+		.then(function (user) {
+			response.status(200).send(user);
+		}, function (error) {
+			response.status(403).send(error.message);
+		});
+	} else {
+		response.send(401);
+	}
 });
 
 /* get feeds the logged user subscribed to */
 app.get("/user/feeds", function (request, response) {
-	response.send(501);
+	if (users[request.cookies.token]) {
+		db.getUser({login: users[request.cookies.token]})
+		.then(function (user) {
+			response.status(200).send(user.subscriptions);
+		}, function (error) {
+			response.status(403).send(error.message);
+		});
+	} else {
+		response.send(401);
+	}
 });
 
 /* get feed's last stories */
-app.get("/feeds/:feed", function (request, response) {
-	response.send(501);
+app.get("\^\/feeds\/*", function (request, response) {
+	if (users[request.cookies.token]) {
+		feed.get_stories(request.params[0])
+		.then(function (data) {
+			response.status(200).send(data);
+		}, function (error) {
+			response.status(403).send(error.message);
+		});
+	} else {
+		response.send(401);
+	}
 });
 
 /* subscribe to a feed */
-app.put("/user/feeds/:feed_url", function (request, response) {
-	response.send(501);
+app.put("\^\/user\/feeds\/*", function (request, response) {
+	if (users[request.cookies.token]) {
+		feed.get_meta(request.params[0])
+		.then(function (meta) {
+			db.addSubscription({login: users[request.cookies.token]}, meta)
+			.then(function (data) {
+				response.send(204);
+			}, function (error) {
+				response.status(403).send(error.message);
+			});
+		}, function(error) {
+			response.status(403).send(error.message);
+		});
+	} else {
+		response.send(401);
+	}
 });
 
 app.listen(3000);
