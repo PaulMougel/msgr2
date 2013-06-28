@@ -9,7 +9,7 @@ var DBNAME = '/msgr';
 function doGET(url) {
     var d = deferred();
     var req = http.request(
-        { host: HOST, port: PORT, method: 'GET', path: DBNAME + '/' + url },
+        { host: HOST, port: PORT, method: 'GET', path: url },
         function(res) {
             var data = '';
             res.on('data', function(chunk) { data += chunk; });
@@ -37,7 +37,7 @@ function doGET(url) {
 function doPUT(url, data) {
     var d = deferred();
     var req = http.request(
-        { host: HOST, port: PORT, method: 'PUT', path: DBNAME + '/' + url },
+        { host: HOST, port: PORT, method: 'PUT', path: url },
         function(res) {
             var data = '';
             res.on('data', function(chunk) { data += chunk; });
@@ -81,25 +81,31 @@ function signup(user) {
     user.password = hash(user.password);
     user.subscriptions = [];
 
-    return doPUT(user.login, user);
+    return doPUT(DBNAME + '/' + user.login, user);
 }
 
 function signin(user) {
-    return doGET(user.login)
+    return doGET(DBNAME + '/' + user.login)
     .then(
-        function (user) {
-            if (user.password === hash(user.password)) {
-                return cleanUser(user);
+        function (u) {
+            if (u.password === hash(user.password)) {
+                // Get a token from CouchDB
+                return doGET('/_uuids').then(
+                    function(data) {
+                        u.token = data.uuids[0];
+                        return cleanUser(u);
+                    }
+                );
             }
             else {
-                throw new Error(('Wrong login'));
+                throw new Error(('Wrong password'));
             }
         }
     );
 }
 
 function getUser(user) {
-    return doGET(user.login)
+    return doGET(DBNAME + '/' + user.login)
     .then(
         function (user) {
             return cleanUser(user);
@@ -110,21 +116,21 @@ function getUser(user) {
 function addSubscription(user, feed) {
     feed.type = 'feed';
 
-    return doGET(user.login)
+    return doGET(DBNAME + '/' + user.login)
     .then(
         function (user) {
             user.subscriptions.push(feed);
-            return doPUT(user.login, user);
+            return doPUT(DBNAME + '/' + user.login, user);
         }
     );
 }
 
 function addSubscription(user, feed) {
-    return doGET(user.login)
+    return doGET(DBNAME + '/' + user.login)
     .then(
         function (user) {
             user.subscriptions.push(feed);
-            return doPUT(user.login, user);
+            return doPUT(DBNAME + '/' + user.login, user);
         }
     );
 }
@@ -133,3 +139,5 @@ exports.signup = signup;
 exports.signin = signin;
 exports.getUser = getUser;
 exports.addSubscription = addSubscription;
+
+signin({login:'pmol', password:'bra'}).then(function(d) {console.log(d)}, function(d) {console.log(d)});
