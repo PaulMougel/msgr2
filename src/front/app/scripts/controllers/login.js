@@ -2,11 +2,9 @@
 
 angular.module('msgr')
     .controller('LoginController', function ($scope, $location, authService) {
-        $scope.foundation();
-
         $scope.signin = function() {
             var user = { login: $scope.login, password: $scope.password };
-            
+
             authService.signin(user)
             .success(function() {
                 $location.path('/stories/');
