@@ -1,4 +1,5 @@
 var http = require('http');
+var crypto = require('crypto');
 var deferred = require('deferred');
 var HOST = 'localhost';
 var PORT = 5984;
@@ -36,7 +37,8 @@ function doPUT(url, data) {
 
 function signup(user) {
     user.type = 'user';
-    return doPUT(user.login, user)
+    user.password = crypto.createHash("sha512").update(user.password, "utf8").digest("hex");
+    return doPUT(user.login, user);
 }
 
 exports.signup = signup;

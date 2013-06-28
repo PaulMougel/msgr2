@@ -33,7 +33,7 @@ Here is the format of a user:
 ```
 
 Available functions:
-- `signup(user)`
+- `signup(user)`, where the password is plaintext (will be hashed by the function)
 
 ## REST API
 
