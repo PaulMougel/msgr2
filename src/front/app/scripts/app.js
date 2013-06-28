@@ -17,4 +17,10 @@ angular.module('msgr', ['xml'])
 }])
 .config(function ($httpProvider) {
     $httpProvider.responseInterceptors.push('xmlHttpInterceptor');
+})
+.constant('apiBaseUrl', 'http://' + document.domain + ':3000')
+.run(function($rootScope) {
+	// Function to be called by each controller once the view is loaded
+	// It will initialize foundation's components
+	$rootScope.foundation = function() { $(document).foundation(); };
 });

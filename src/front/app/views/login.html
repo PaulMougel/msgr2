@@ -1,27 +1,62 @@
 <div class="row" ng-controller="LoginController">
     <div class="large-offset-3 large-6 columns">
-        <form ng-submit="getLog()">
-            <fieldset>
-                <legend>Please login to Monsignor</legend>
+        <div class="section-container tabs" data-section="tabs">
+            <section class="active">
+                <p class="title" data-section-title=""><a href="#signin">Sign in</a></p>
+                <div class="content" data-section-content="" data-slug="signin">
+                    <form ng-submit="signin()">
+                        <fieldset>
+                            <legend>Please sign into Monsignor</legend>
 
-                <div class="row">
-                    <div class="large-12 columns">
-                        <input type="text" placeholder="Email" ng-model="email" />
-                    </div>
-                </div>
+                            <div class="row">
+                                <div class="large-12 columns">
+                                    <input type="text" placeholder="Email" ng-model="email" />
+                                </div>
+                            </div>
 
-                <div class="row">
-                    <div class="large-12 columns">
-                        <input type="password" placeholder="Password" ng-model="password" />
-                    </div>
-                </div>
+                            <div class="row">
+                                <div class="large-12 columns">
+                                    <input type="password" placeholder="Password" ng-model="password" />
+                                </div>
+                            </div>
 
-                <div class="row">
-                    <div class="large-12 columns">
-                        <button type="submit" class="large expand">Login</button>
-                    </div>
+                            <div class="row">
+                                <div class="large-12 columns">
+                                    <button type="submit" class="large expand">Login!</button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
                 </div>
-            </fieldset>
-        </form>
+            </section> 
+            <section>
+                <p class="title" data-section-title=""><a href="#signup">Sign up</a></p>
+                <div class="content" data-section-content="" data-slug="signup">
+                    <form ng-submit="signup()">
+                        <fieldset>
+                            <legend>Welcome to Monsignor!</legend>
+
+                            <div class="row">
+                                <div class="large-12 columns">
+                                    <input type="text" placeholder="Your email address" ng-model="email" />
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="large-12 columns">
+                                    <input type="password" placeholder="Your password" ng-model="password" />
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="large-12 columns">
+                                    <button type="submit" class="large expand">Sign up!</button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </section> 
+        </div>
     </div>
 </div>

@@ -1,19 +1,30 @@
 'use strict';
 
 angular.module('msgr')
-    .controller('LoginController', function ($scope, $location, superfeedrService, databaseService) {
-        $scope.getLog = function() {
-            var login = $scope.email;
-            var password = $scope.password;
+    .controller('LoginController', function ($scope, $location, authService) {
+        $scope.foundation();
 
-            superfeedrService.login(login, password)
-            .success(function(data, status, headers, config) {
-                superfeedrService.registerToken(data);
-                databaseService.init(login);
+        $scope.signin = function() {
+            var user = { login: $scope.email, password: $scope.password };
+            
+            authService.signin(user)
+            .success(function() {
                 $location.path('/stories/');
             })
             .error(function() {
-                alert('Login failure!');
+                alert('Signin failure!');
+            });
+        };
+
+        $scope.signup = function() {
+            var user = { login: $scope.email, password: $scope.password };
+            
+            authService.signup(user)
+            .success(function() {
+                $location.path('/stories/');
+            })
+            .error(function() {
+                alert('Signup failure!');
             });
         };
     });
