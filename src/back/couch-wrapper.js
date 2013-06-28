@@ -74,27 +74,19 @@ function signup(user) {
     return doPUT(user.login, user);
 }
 
-function login(user) {
-    var hashedPassword = hash(user.password);
-
-    var d = deferred();
-    doGET(user.login)
+function signin(user) {
+    return doGET(user.login)
     .then(
-        function(data) {
-            if (data.password == hashedPassword) {
-                var user = {login: data.login};
-                d.resolve(user);
-            } else {
-                d.reject(new Error('Wrong password'));
+        function (data) {
+            if (data.password === hash(user.password)) {
+                return {login: data.login};
             }
-        },
-        function(err) {
-            d.reject(new Error('Wrong login'));
+            else {
+                throw new Error(('Wrong login'));
+            }
         }
     );
-
-    return d.promise;
 }
 
 exports.signup = signup;
-exports.login = login;
+exports.signin = signin;

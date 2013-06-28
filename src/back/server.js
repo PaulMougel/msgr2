@@ -34,7 +34,18 @@ app.all("*", function (request, response, next) {
 
 /* sign-in */
 app.post("/users/signin", function (request, response) {
-	response.send(501);
+	if (request.body.login && request.body.password) {
+		db.signin({
+			login: request.body.login,
+			password: request.body.password
+		}).then(function (data) {
+			response.send(200);
+		}, function (error) {
+			response.status(401).send(error.message);
+		});
+	} else {
+		response.send(400);
+	}
 });
 
 /* sign-up */
@@ -44,7 +55,6 @@ app.post("/users/signup", function (request, response) {
 			login: request.body.login,
 			password: request.body.password
 		}).then(function (data) {
-			console.log(data);
 			response.send(201);
 		}, function (error) {
 			response.status(403).send(error.message);

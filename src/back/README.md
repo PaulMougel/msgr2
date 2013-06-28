@@ -34,7 +34,7 @@ Here is the format of a user:
 
 Available functions:
 - `signup(user)`, where the password is plaintext (will be hashed by the function)
-- `login(user)`, where the password is plaintext (will be hashed by the function). If the login is successful, returns a user object (without the password field).
+- `signin(user)`, where the password is plaintext (will be hashed by the function). If the signin is successful, returns a user object (without the password field).
 
 ## REST API
 
@@ -51,7 +51,7 @@ It supports cross origin resource sharing as documented [here](http://www.w3.org
 
     POST /users/signup
 
-### Input (request json body)
+### Input
 
  * login
   * *Required* **string**
@@ -61,3 +61,18 @@ It supports cross origin resource sharing as documented [here](http://www.w3.org
 ### Response
 
 Status: 201 Created
+
+#### Sign-in
+
+    POST /users/signin
+
+### Input
+
+ * login
+  * *Required* **string**
+ * password
+  * *Required* **string**
+
+### Response
+
+Status: 200 OK
