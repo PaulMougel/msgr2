@@ -7,7 +7,6 @@ angular.module('msgr')
 
             authService.signin(user)
             .success(function() {
-                $location.path('/stories/');
             })
             .error(function() {
                 alert('Signin failure!');

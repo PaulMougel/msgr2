@@ -7,9 +7,6 @@ angular.module('msgr', ['xml'])
         templateUrl: 'views/login.html',
         controller: 'LoginController'
     })
-    .when('/stories/', {
-        templateUrl: 'views/stories.html',
-        controller: 'AtomController'
     })
     .otherwise({
         templateUrl: 'views/404.html'
