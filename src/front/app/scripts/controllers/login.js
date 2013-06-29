@@ -7,6 +7,7 @@ angular.module('msgr')
 
             authService.signin(user)
             .success(function() {
+                $location.path('/subscriptions/');
             })
             .error(function() {
                 alert('Signin failure!');

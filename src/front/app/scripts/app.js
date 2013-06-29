@@ -5,8 +5,9 @@ angular.module('msgr', ['xml'])
     $routeProvider
     .when('/', {
         templateUrl: 'views/login.html',
-        controller: 'LoginController'
     })
+    .when('/subscriptions/', {
+        templateUrl: 'views/subscriptions.html',
     })
     .otherwise({
         templateUrl: 'views/404.html'
