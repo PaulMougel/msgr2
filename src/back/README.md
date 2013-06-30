@@ -27,27 +27,27 @@ signup({
 User format:
 ```json
 {
-    login: 'foo',
-    password: 'bar',
-    subscriptions: [list of subscriptions]
+    "login": "foo",
+    "password": "bar",
+    "subscriptions": []
 }
 ```
 
 Available functions:
 - `signup({login:'foo', password:'bar'})`, where the password is plaintext (will be hashed by the function)
 - `signin({login:'foo', password:'bar'})`, where the password is plaintext (will be hashed by the function)
-- `getUser({login: 'foo'}) will return a user's informations (minus the password field)
+- `getUser({login: 'foo'})` will return a user's informations (minus the password field)
 
 ### Subscriptions management
 
 Subscription format:
 ```json
 {
-    title,
-    description,
-    link, // Link to website
-    xmlUrl, // RSS URL
-    unread = [] // list of unread stories identified by their guid
+    "title",
+    "description",
+    "link", // Link to website
+    "xmlUrl", // RSS URL
+    "unread": [] // list of unread stories identified by their guid
 }
 ```
 
@@ -71,10 +71,10 @@ It supports cross origin resource sharing as documented [here](http://www.w3.org
 
 ##### Input
 
- * login
-  _Required_ **string**
- * password
-  _Required_ **string**
+* login
+_Required_ **string**
+* password
+_Required_ **string**
 
 ##### Response
 
@@ -157,8 +157,8 @@ Status: 200 OK
 
 ##### Parameters
 
- * filter
-  `all`, `unread`. Default: `all`.
+* filter
+`all`, `unread`. Default: `all`.
 
 ##### Response
 
