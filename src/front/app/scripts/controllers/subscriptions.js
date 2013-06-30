@@ -2,7 +2,17 @@
 
 angular.module('msgr')
 .controller('SubscriptionsController', function ($scope, subscriptionsService) {
-    subscriptionsService.getSubscriptions().success(function(data) {
-        $scope.subscriptions = data;
-    });
+    var refreshSubscriptions = function() {
+        subscriptionsService.getAll().success(function(data) {
+            $scope.subscriptions = data;
+        });
+    };
+
+    $scope.add = function() {
+        var url = encodeURIComponent($scope.xmlUrl);
+        subscriptionsService.add(url).success(refreshSubscriptions);
+    };
+
+    // Initialization
+    refreshSubscriptions();
 });
