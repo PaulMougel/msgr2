@@ -152,7 +152,7 @@ Status: 200 OK
 
 #### Get subscription stories
 
-    POST /feeds/:feed_url
+    GET /feeds/:feed_url
 
 ##### Parameter
 
