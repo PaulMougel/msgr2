@@ -195,7 +195,7 @@ The updated user.
 }
 ```
 
-Status: 204 No Content
+Status: 20O OK
 
 #### Get authenticated user's subscriptions
 
