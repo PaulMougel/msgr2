@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('msgr')
-.controller('SubscriptionsController', function ($scope, subscriptionsService) {
+.controller('SubscriptionsController', function ($scope, authService, subscriptionsService) {
     var refreshSubscriptions = function() {
         subscriptionsService.getAll().success(function(data) {
             $scope.subscriptions = data;
@@ -14,5 +14,7 @@ angular.module('msgr')
     };
 
     // Initialization
-    refreshSubscriptions();
+    authService.ensureLogin().success(function() {
+        refreshSubscriptions();
+    });
 });
