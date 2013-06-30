@@ -114,18 +114,6 @@ function getUser(user) {
 }
 
 function addSubscription(user, feed) {
-    feed.type = 'feed';
-
-    return doGET(DBNAME + '/' + user.login)
-    .then(
-        function (user) {
-            user.subscriptions.push(feed);
-            return doPUT(DBNAME + '/' + user.login, user);
-        }
-    );
-}
-
-function addSubscription(user, feed) {
     return doGET(DBNAME + '/' + user.login)
     .then(
         function (user) {
@@ -139,5 +127,3 @@ exports.signup = signup;
 exports.signin = signin;
 exports.getUser = getUser;
 exports.addSubscription = addSubscription;
-
-//signin({login:'pmol', password:'bra'}).then(function(d) {console.log(d)}, function(d) {console.log(d)});
