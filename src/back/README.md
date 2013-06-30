@@ -46,7 +46,8 @@ Subscription format:
     title,
     description,
     link, // Link to website
-    xmlUrl // RSS URL
+    xmlUrl, // RSS URL
+    unread = [] // list of unread stories identified by their guid
 }
 ```
 
@@ -70,10 +71,10 @@ It supports cross origin resource sharing as documented [here](http://www.w3.org
 
 ##### Input
 
- * login
-  * *Required* **string**
- * password
-  * *Required* **string**
+login
+: _Required_ **string**
+password
+: _Required_ **string**
 
 ##### Response
 
@@ -85,10 +86,10 @@ Status: 201 Created
 
 ##### Input
 
- * login
-  * *Required* **string**
- * password
-  * *Required* **string**
+login
+: _Required_ **string**
+password
+: _Required_ **string**
 
 ##### Response
 
@@ -154,10 +155,10 @@ Status: 200 OK
 
     GET /feeds/:feed_url
 
-##### Parameter
+##### Parameters
 
- * feed_url
-  * *Required* **string**
+filter
+: `all`, `unread`. Default: `all`.
 
 ##### Response
 
@@ -178,11 +179,6 @@ Status: 200 OK
 #### Subscribe to a feed
 
     PUT /user/feeds/:feed_url
-
-##### Parameter
-
- * feed_url
-  * *Required* **string**
 
 ##### Response
 

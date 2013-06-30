@@ -3,19 +3,27 @@
 var FeedParser = require("feedparser"), request = require("request"), deferred = require('deferred');
 
 function get_meta(url) {
-	var d = deferred();
+	var d = deferred(), meta = {}, guids = [];
 	request(url)
 	.pipe(new FeedParser())
 	.on("error", function (error) {
 		d.reject(error);
 	})
-	.on("meta", function (meta) {
-		d.resolve({
-			title: meta.title,
-			description: meta.description,
-			link: meta.link,
-			xmlUrl: meta.xmlUrl
-		});
+	.on("meta", function (data) {
+		meta.title = data.title;
+		meta.description = data.description;
+		meta.link = data.link;
+		meta.xmlUrl = data.xmlUrl;
+	})
+	.on("readable", function() {
+		var stream = this, item;
+		while (item = stream.read()) {
+			guids.push(item.guid);
+		}
+	})
+	.on("end", function () {
+		meta.unread = guids;
+		d.resolve(meta);
 	});
 	return d.promise;
 }

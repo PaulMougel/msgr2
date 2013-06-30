@@ -7,6 +7,7 @@
     "express": "3.x",
     "deferred": "0.6.x",
     "feedparser": "0.16.x",
-    "request": "2.21.x"
+    "request": "2.21.x",
+    "underscore": "1.4.x"
   }
 }

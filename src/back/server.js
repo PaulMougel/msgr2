@@ -3,6 +3,7 @@ var feed = require("./feed-wrapper");
 
 var express = require("express");
 var crypto = require("crypto");
+var _ = require("underscore");
 
 var app = express();
 var users = [];
@@ -102,7 +103,21 @@ app.get("\^\/feeds\/*", function (request, response) {
 	if (users[request.cookies.token]) {
 		feed.get_stories(request.params[0])
 		.then(function (data) {
-			response.status(200).send(data);
+			if (request.query.filter === "unread") {
+				db.getUser({login: users[request.cookies.token]})
+				.then(function (user) {
+					var unread = _.find(user.subscriptions, function (s) {
+						return (s.xmlUrl === request.params[0])
+					}).unread, dataToSend = [];
+					dataToSend = _.filter(data, function (d) {
+						return unread.indexOf(d.guid) != -1;
+					});
+					response.status(200).send(dataToSend);
+				});
+			}
+			else {
+				response.status(200).send(data);
+			}
 		}, function (error) {
 			response.status(403).send(error.message);
 		});
