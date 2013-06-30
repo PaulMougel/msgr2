@@ -99,15 +99,16 @@ app.get("/user/feeds", function (request, response) {
 });
 
 /* get feed's last stories */
-app.get("\^\/feeds\/*", function (request, response) {
+app.get("\^\/user\/feeds\/*", function (request, response) {
+	var feed_url = decodeURIComponent(request.params[0]);
 	if (users[request.cookies.token]) {
-		feed.get_stories(request.params[0])
+		feed.get_stories(feed_url)
 		.then(function (data) {
 			if (request.query.filter === "unread") {
 				db.getUser({login: users[request.cookies.token]})
 				.then(function (user) {
 					var unread = _.find(user.subscriptions, function (s) {
-						return (s.xmlUrl === request.params[0])
+						return (s.xmlUrl === feed_url)
 					}).unread, dataToSend = [];
 					dataToSend = _.filter(data, function (d) {
 						return unread.indexOf(d.guid) != -1;
@@ -126,14 +127,43 @@ app.get("\^\/feeds\/*", function (request, response) {
 	}
 });
 
+/* mark an article as read */
+app.post("\^\/user\/feeds\/*\/*\/read", function (request, response) {
+	var feed_url = decodeURIComponent(request.params[0]), story_guid = decodeURIComponent(request.params[1]);
+	if (users[request.cookies.token]) {
+		db.getUser({login: users[request.cookies.token]})
+		.then(function (user) {
+			var unread = _.find(user.subscriptions, function (s) {
+				return (s.xmlUrl === feed_url)
+			}).unread;
+			unread = _.without(unread, story_guid);
+			user.subscriptions[_.indexOf(user.subscriptions, _.findWhere(user.subscriptions, {xmlUrl: feed_url}))].unread = unread;
+			return db.updateUser(user)
+			.then(function () {
+				return user;
+			});
+		})
+		.then(
+			function (user) {
+				response.status(200).send(user);
+			}, function (error) {
+				response.status(403).send(error.message);
+			}
+		);
+	} else {
+		response.send(401);
+	}
+});
+
 /* subscribe to a feed */
 app.put("\^\/user\/feeds\/*", function (request, response) {
 	if (users[request.cookies.token]) {
-		feed.get_meta(request.params[0])
+		var feed_url = decodeURIComponent(request.params[0]);
+		feed.get_meta(feed_url)
 		.then(function (meta) {
 			db.addSubscription({login: users[request.cookies.token]}, meta)
-			.then(function (data) {
-				response.send(204);
+			.then(function (user) {
+				response.status(200).send(user);
 			}, function (error) {
 				response.status(403).send(error.message);
 			});

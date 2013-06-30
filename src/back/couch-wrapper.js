@@ -17,8 +17,7 @@ function doGET(url) {
                 var result = JSON.parse(data);
 
                 if (res.statusCode >= 400) {
-                    var error = new Error('HTTP error code');
-                    error.message = result;
+                    var error = new Error(result.error);
                     d.reject(error);
                 } else {
                     d.resolve(result);
@@ -45,8 +44,7 @@ function doPUT(url, data) {
                 var result = JSON.parse(data);
 
                 if (res.statusCode >= 400) {
-                    var error = new Error('HTTP error code');
-                    error.message = result;
+                    var error = new Error(result.error);
                     d.reject(error);
                 } else {
                     d.resolve(result);
@@ -113,12 +111,28 @@ function getUser(user) {
     );
 }
 
+function updateUser(user) {
+    return doGET(DBNAME + '/' + user.login)
+    .then(function (u) {
+        /* restore deleted fields */
+        user._rev = u._rev;
+        user.type = u.type;
+        if (!user.password) {
+            user.password = u.password;
+        }
+        return doPUT(DBNAME + '/' + user.login, user);
+    });
+}
+
 function addSubscription(user, feed) {
     return doGET(DBNAME + '/' + user.login)
     .then(
         function (user) {
             user.subscriptions.push(feed);
-            return doPUT(DBNAME + '/' + user.login, user);
+            return doPUT(DBNAME + '/' + user.login, user)
+            .then(function (result) {
+                return cleanUser(user);
+            })
         }
     );
 }
@@ -126,4 +140,5 @@ function addSubscription(user, feed) {
 exports.signup = signup;
 exports.signin = signin;
 exports.getUser = getUser;
+exports.updateUser = updateUser;
 exports.addSubscription = addSubscription;

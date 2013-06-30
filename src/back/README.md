@@ -37,6 +37,7 @@ Available functions:
 - `signup({login:'foo', password:'bar'})`, where the password is plaintext (will be hashed by the function)
 - `signin({login:'foo', password:'bar'})`, where the password is plaintext (will be hashed by the function)
 - `getUser({login: 'foo'})` will return a user's informations (minus the password field)
+- `updateUser({login: 'foo', subscriptions: []})` will update the user (minus the password field if a new password is not provided, minus the type field)
 
 ### Subscriptions management
 
@@ -132,6 +133,70 @@ Set-Cookie: token=*your_secret_token*
 
 Status: 200 OK
 
+#### Subscribe to a feed
+
+    PUT /user/feeds/:feed_url
+
+##### Response
+
+The updated user.
+
+```json
+{
+  "login": "kikoo",
+  "subscriptions": [
+    {
+      "title": "LinuxFr.org : les journaux",
+      "description": null,
+      "link": "http://linuxfr.org/journaux",
+      "xmlUrl": "http://linuxfr.org/journaux.atom",
+      "unread": [
+        "tag:linuxfr.org,2005:Diary/34064",
+        "tag:linuxfr.org,2005:Diary/34063",
+        "tag:linuxfr.org,2005:Diary/34062",
+        "tag:linuxfr.org,2005:Diary/34061",
+        "tag:linuxfr.org,2005:Diary/34060",
+        "tag:linuxfr.org,2005:Diary/34059",
+        "tag:linuxfr.org,2005:Diary/34058",
+        "tag:linuxfr.org,2005:Diary/34057",
+        "tag:linuxfr.org,2005:Diary/34056",
+        "tag:linuxfr.org,2005:Diary/34055",
+        "tag:linuxfr.org,2005:Diary/34054",
+        "tag:linuxfr.org,2005:Diary/34053",
+        "tag:linuxfr.org,2005:Diary/34052",
+        "tag:linuxfr.org,2005:Diary/34051",
+        "tag:linuxfr.org,2005:Diary/34050"
+      ]
+    },
+    {
+      "title": "LinuxFr.org : les journaux",
+      "description": null,
+      "link": "http://linuxfr.org/journaux",
+      "xmlUrl": "http://linuxfr.org/journaux.atom",
+      "unread": [
+        "tag:linuxfr.org,2005:Diary/34064",
+        "tag:linuxfr.org,2005:Diary/34063",
+        "tag:linuxfr.org,2005:Diary/34062",
+        "tag:linuxfr.org,2005:Diary/34061",
+        "tag:linuxfr.org,2005:Diary/34060",
+        "tag:linuxfr.org,2005:Diary/34059",
+        "tag:linuxfr.org,2005:Diary/34058",
+        "tag:linuxfr.org,2005:Diary/34057",
+        "tag:linuxfr.org,2005:Diary/34056",
+        "tag:linuxfr.org,2005:Diary/34055",
+        "tag:linuxfr.org,2005:Diary/34054",
+        "tag:linuxfr.org,2005:Diary/34053",
+        "tag:linuxfr.org,2005:Diary/34052",
+        "tag:linuxfr.org,2005:Diary/34051",
+        "tag:linuxfr.org,2005:Diary/34050"
+      ]
+    }
+  ]
+}
+```
+
+Status: 204 No Content
+
 #### Get authenticated user's subscriptions
 
     GET /user/feeds
@@ -153,7 +218,7 @@ Status: 200 OK
 
 #### Get subscription stories
 
-    GET /feeds/:feed_url
+    GET /user/feeds/:feed_url
 
 ##### Parameters
 
@@ -176,10 +241,44 @@ Status: 200 OK
 
 Status: 200 OK
 
-#### Subscribe to a feed
+#### Mark a story as read
 
-    PUT /user/feeds/:feed_url
+  POST /user/feeds/:feed_url/:story_guid/read
 
 ##### Response
 
-Status: 204 No Content
+The updated user.
+
+```json
+{
+  "login": "kikoo",
+  "subscriptions": [
+    {
+      "title": "LinuxFr.org : les journaux",
+      "description": null,
+      "link": "http://linuxfr.org/journaux",
+      "xmlUrl": "http://linuxfr.org/journaux.atom",
+      "unread": [
+        "tag:linuxfr.org,2005:Diary/34063",
+        "tag:linuxfr.org,2005:Diary/34062",
+        "tag:linuxfr.org,2005:Diary/34061",
+        "tag:linuxfr.org,2005:Diary/34060",
+        "tag:linuxfr.org,2005:Diary/34059",
+        "tag:linuxfr.org,2005:Diary/34058",
+        "tag:linuxfr.org,2005:Diary/34057",
+        "tag:linuxfr.org,2005:Diary/34056",
+        "tag:linuxfr.org,2005:Diary/34054",
+        "tag:linuxfr.org,2005:Diary/34053",
+        "tag:linuxfr.org,2005:Diary/34052",
+        "tag:linuxfr.org,2005:Diary/34051",
+        "tag:linuxfr.org,2005:Diary/34050"
+      ]
+    }
+  ],
+  "_rev": "31-05191487fc809eb187ce0be7dbb148e4",
+  "type": "user",
+  "password": "6a1a46ca023d02adff34ff157cab7e18322534d256f57fa0ba2a4b047aff696e0889d93cbdec89c3e0b62143abe33c1f54295e30619a208431fea55d7abf9749"
+}
+```
+
+Status: 200 OK
