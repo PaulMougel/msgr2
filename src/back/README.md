@@ -7,7 +7,7 @@ This is the backend server of Monsignor.
 `couch-wrapper.js`, provides a database abstraction layer.
 
 All function calls return promises. If an error is thrown by CouchDB: the promise is rejected and the message is stored in the `error.message` property. Sample code :
-```
+```javascript
 signup({
     login: 'foo',
     password: 'bar'
@@ -25,7 +25,7 @@ signup({
 ### User management
 
 User format:
-```
+```json
 {
     login: 'foo',
     password: 'bar',
@@ -41,7 +41,7 @@ Available functions:
 ### Subscriptions management
 
 Subscription format:
-```
+```json
 {
     title,
     description,
@@ -71,10 +71,10 @@ It supports cross origin resource sharing as documented [here](http://www.w3.org
 
 ##### Input
 
-login
-: _Required_ **string**
-password
-: _Required_ **string**
+ * login
+  _Required_ **string**
+ * password
+  _Required_ **string**
 
 ##### Response
 
@@ -86,10 +86,10 @@ Status: 201 Created
 
 ##### Input
 
-login
-: _Required_ **string**
-password
-: _Required_ **string**
+ * login
+  _Required_ **string**
+ * password
+  _Required_ **string**
 
 ##### Response
 
@@ -157,8 +157,8 @@ Status: 200 OK
 
 ##### Parameters
 
-filter
-: `all`, `unread`. Default: `all`.
+ * filter
+  `all`, `unread`. Default: `all`.
 
 ##### Response
 
