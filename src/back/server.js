@@ -43,7 +43,7 @@ app.post("/users/signin", function (request, response) {
 			login: request.body.login,
 			password: request.body.password
 		}).then(function (user) {
-			response.cookie('token', user.token, {maxAge: 900000});
+			response.cookie('token', user.token, {maxAge: 86400000);
 			response.status(200).send(user);
 			users[user.token] = user.login;
 		}, function (error) {
