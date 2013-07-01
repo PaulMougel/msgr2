@@ -1,0 +1,10 @@
+.feed-table-list {
+    // By default tables don't fill al the space they can take
+    width: 100%;
+    // Links inside the cells will fill the whole cell, the user
+    // will be able to click anywhere inside the cell (including white space)
+    // to go to the feed page. Useful especially for mobile devices.  
+    td a {
+        display: block;
+    }
+}

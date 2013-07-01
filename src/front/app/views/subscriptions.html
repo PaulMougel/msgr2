@@ -1,15 +1,24 @@
 <div ng-controller="SubscriptionsController">
     <div class="row">
-        <div class="large-offset-1 large-10-columns">
+
+        <div class="large-offset-1 large-10 columns">
             <!-- List of existing subscriptions -->
             <div class="row">
-                <ul>
-                    <li ng-repeat="subscription in subscriptions">
-                        <a href="#/feed/{{ subscription.title | slugify }}">{{ subscription.title }} ({{ subscription.unread.length }})</a>
-                    </li>
-                </ul>
+                <h1>Your subscriptions</h1>
+                <table class="feed-table-list">
+                    <tbody>
+                        <tr ng-repeat="subscription in subscriptions">
+                            <td>
+                                <a href="#/feed/{{ subscription.title | slugify }}">
+                                    {{ subscription.title }}
+                                    <span class="label round pull-right">{{ subscription.unread.length }}</span>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-            
+
             <!-- Add a new subscription form -->
             <div class="row">
                 <form ng-submit="add()">
