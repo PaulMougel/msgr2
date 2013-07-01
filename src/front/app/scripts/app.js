@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('msgr', ['xml'])
+angular.module('msgr', ['xml', 'slugifier'])
 .config(['$routeProvider', function ($routeProvider) {
     $routeProvider
     .when('/', {
@@ -8,6 +8,9 @@ angular.module('msgr', ['xml'])
     })
     .when('/subscriptions/', {
         templateUrl: 'views/subscriptions.html',
+    })
+    .when('/feed/:titleSlug', {
+        templateUrl: 'views/feed.html',
     })
     .otherwise({
         templateUrl: 'views/404.html'

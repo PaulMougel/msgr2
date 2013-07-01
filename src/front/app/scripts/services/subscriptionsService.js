@@ -10,11 +10,17 @@ angular.module('msgr')
                 withCredentials: true
             });
         },
-
         add: function(xmlUrl) {
             return $http({
                 method: 'PUT',
-                url: apiBaseUrl + '/user/feeds/' + xmlUrl,
+                url: apiBaseUrl + '/user/feeds/' + encodeURIComponent(xmlUrl),
+                withCredentials: true
+            });
+        },
+        get: function(xmlUrl) {
+            return $http({
+                method: 'GET',
+                url: apiBaseUrl + '/feeds/' + encodeURIComponent(xmlUrl),
                 withCredentials: true
             });
         }

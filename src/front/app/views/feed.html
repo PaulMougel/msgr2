@@ -1,0 +1,11 @@
+<div ng-controller="FeedController">
+    <div class="row">
+        <div class="large-offset-1 large-10-columns">
+            <!-- List of feed articles -->
+            <div class="row" ng-repeat="article in articles">
+                <h1>{{ article.title }}</h1>
+                 <div ng-bind-html-unsafe="article.description"></div>
+            </div>
+        </div>
+    </div>
+</div>

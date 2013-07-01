@@ -9,8 +9,7 @@ angular.module('msgr')
     };
 
     $scope.add = function() {
-        var url = encodeURIComponent($scope.xmlUrl);
-        subscriptionsService.add(url).success(refreshSubscriptions);
+        subscriptionsService.add($scope.xmlUrl).success(refreshSubscriptions);
     };
 
     // Initialization
