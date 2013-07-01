@@ -5,7 +5,7 @@
             <div class="row">
                 <ul>
                     <li ng-repeat="subscription in subscriptions">
-                        <a href="#/feed/{{ subscription.title | slugify }}">{{ subscription.title }}</a>
+                        <a href="#/feed/{{ subscription.title | slugify }}">{{ subscription.title }} ({{ subscription.unread.length }})</a>
                     </li>
                 </ul>
             </div>
