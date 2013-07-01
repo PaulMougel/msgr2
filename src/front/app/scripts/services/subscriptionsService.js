@@ -20,7 +20,7 @@ angular.module('msgr')
         get: function(xmlUrl) {
             return $http({
                 method: 'GET',
-                url: apiBaseUrl + '/feeds/' + encodeURIComponent(xmlUrl),
+                url: apiBaseUrl + '/user/feeds/' + encodeURIComponent(xmlUrl),
                 withCredentials: true
             });
         }
