@@ -241,9 +241,9 @@ Status: 200 OK
 
 Status: 200 OK
 
-#### Mark a story as read
+#### Mark a story as read/unread
 
-  POST /user/feeds/:feed_url/:story_guid/read
+  POST /user/feeds/:feed_url/:story_guid/[un]read
 
 ##### Response
 

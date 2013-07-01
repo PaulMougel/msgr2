@@ -26,6 +26,8 @@
 
 	curl -X GET -b'token=token' 'http://127.0.0.1:3000/user/feeds/http%3A%2F%2Flinuxfr.org%2Fjournaux.atom?filter=unread' -D-
 
-## Mark a story as read
+## Mark a story as read/unread
 
 	curl -X POST -b'token=token' 'http://127.0.0.1:3000/user/feeds/http%3A%2F%2Flinuxfr.org%2Fjournaux.atom/tag%3Alinuxfr.org%2C2005%3ADiary%2F34055/read' -D-
+
+	curl -X POST -b'token=token' 'http://127.0.0.1:3000/user/feeds/http%3A%2F%2Flinuxfr.org%2Fjournaux.atom/tag%3Alinuxfr.org%2C2005%3ADiary%2F34055/unread' -D-

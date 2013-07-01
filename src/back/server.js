@@ -43,7 +43,7 @@ app.post("/users/signin", function (request, response) {
 			login: request.body.login,
 			password: request.body.password
 		}).then(function (user) {
-			response.cookie('token', user.token, {maxAge: 86400000);
+			response.cookie('token', user.token, {maxAge: 86400000});
 			response.status(200).send(user);
 			users[user.token] = user.login;
 		}, function (error) {
@@ -137,6 +137,35 @@ app.post("\^\/user\/feeds\/*\/*\/read", function (request, response) {
 				return (s.xmlUrl === feed_url)
 			}).unread;
 			unread = _.without(unread, story_guid);
+			user.subscriptions[_.indexOf(user.subscriptions, _.findWhere(user.subscriptions, {xmlUrl: feed_url}))].unread = unread;
+			return db.updateUser(user)
+			.then(function () {
+				return user;
+			});
+		})
+		.then(
+			function (user) {
+				response.status(200).send(user);
+			}, function (error) {
+				response.status(403).send(error.message);
+			}
+		);
+	} else {
+		response.send(401);
+	}
+});
+
+/* mark an article as read */
+app.post("\^\/user\/feeds\/*\/*\/unread", function (request, response) {
+	var feed_url = decodeURIComponent(request.params[0]), story_guid = decodeURIComponent(request.params[1]);
+	if (users[request.cookies.token]) {
+		db.getUser({login: users[request.cookies.token]})
+		.then(function (user) {
+			var unread = _.find(user.subscriptions, function (s) {
+				return (s.xmlUrl === feed_url)
+			}).unread, story_array = [];
+			story_array.push(story_guid);
+			unread = _.union(unread, story_array);
 			user.subscriptions[_.indexOf(user.subscriptions, _.findWhere(user.subscriptions, {xmlUrl: feed_url}))].unread = unread;
 			return db.updateUser(user)
 			.then(function () {
