@@ -5,52 +5,58 @@ var FeedParser = require("feedparser"), request = require("request"), deferred =
 function get_meta(url) {
 	var d = deferred(), meta = {}, guids = [];
 	request(url)
+		.on('error', function (error) {
+			d.reject(error);
+		})
 	.pipe(new FeedParser())
-	.on("error", function (error) {
-		d.reject(error);
-	})
-	.on("meta", function (data) {
-		meta.title = data.title;
-		meta.description = data.description;
-		meta.link = data.link;
-		meta.xmlUrl = data.xmlUrl;
-	})
-	.on("readable", function() {
-		var stream = this, item;
-		while (item = stream.read()) {
-			guids.push(item.guid);
-		}
-	})
-	.on("end", function () {
-		meta.unread = guids;
-		d.resolve(meta);
-	});
+		.on('error', function (error) {
+			d.reject(error);
+		})
+		.on('meta', function (data) {
+			meta.title = data.title;
+			meta.description = data.description;
+			meta.link = data.link;
+			meta.xmlUrl = data.xmlUrl;
+		})
+		.on('readable', function() {
+			var stream = this, item;
+			while (item = stream.read()) {
+				guids.push(item.guid);
+			}
+		})
+		.on('end', function () {
+			meta.unread = guids;
+			d.resolve(meta);
+		});
 	return d.promise;
 }
 
 function get_stories(url) {
 	var d = deferred(), stories = [];
 	request(url)
+		.on('error', function (error) {
+			d.reject(error);
+		})
 	.pipe(new FeedParser())
-	.on("error", function (error) {
-		d.reject(error);
-	})
-	.on("readable", function() {
-		var stream = this, item;
-		while (item = stream.read()) {
-			stories.push({
-				title: item.title,
-				description: item.description,
-				link: item.link,
-				pubdate: item.pubdate,
-				guid: item.guid
-			});
+		.on('error', function (error) {
+			d.reject(error);
+		})
+		.on('readable', function() {
+			var stream = this, item;
+			while (item = stream.read()) {
+				stories.push({
+					title: item.title,
+					description: item.description,
+					link: item.link,
+					pubdate: item.pubdate,
+					guid: item.guid
+				});
 
-		}
-	})
-	.on("end", function() {
-		d.resolve(stories);
-	});
+			}
+		})
+		.on('end', function() {
+			d.resolve(stories);
+		});
 	return d.promise;
 }
 
