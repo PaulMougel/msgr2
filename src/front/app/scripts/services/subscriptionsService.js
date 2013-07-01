@@ -23,6 +23,13 @@ angular.module('msgr')
                 url: apiBaseUrl + '/user/feeds/' + encodeURIComponent(xmlUrl),
                 withCredentials: true
             });
+        },
+        read: function(xmlUrl, guid) {
+            return $http({
+                method: 'POST',
+                url: apiBaseUrl + '/user/feeds/' + encodeURIComponent(xmlUrl) + '/' + encodeURIComponent(guid) + '/read',
+                withCredentials: true
+            });
         }
     };
 });

@@ -1,10 +1,25 @@
 <div ng-controller="FeedController">
     <div class="row">
         <div class="large-offset-1 large-10-columns">
+            <h1>
+                {{ subscription.title }}
+                <span class="pull-right label round">{{ subscription.unread.length }}</span>
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="large-offset-1 large-10-columns">
             <!-- List of feed articles -->
             <div class="section-container accordion" data-section="accordion">
                 <section ng-repeat="article in articles">
-                    <p class="title" data-section-title><a href="#">{{ article.title }}</a></p>
+                    <p class="title" data-section-title>
+                        <a href="#" ng-click="toggleRead(article)">
+                            {{ article.title }}
+                            <span ng-show="article.unread" class="pull-right label round">u</span>
+                            <span ng-hide="article.unread" class="pull-right label round success">r</span>
+                        </a>
+                    </p>
                     <div class="content" data-section-content>
                         <div ng-bind-html-unsafe="article.description"></div>
                     </div>

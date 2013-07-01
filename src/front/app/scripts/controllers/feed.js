@@ -2,18 +2,32 @@
 
 angular.module('msgr')
 .controller('FeedController', function ($scope, $routeParams, $location, authService, subscriptionsService, Slug) {
+    $scope.toggleRead = function(article) {
+        subscriptionsService.read($scope.subscription.xmlUrl, article.guid).success(function() {
+            article.unread = false;
+            $scope.subscription.unread = _.without($scope.subscription.unread, article.guid);
+        });
+    };
+
     // Initialization
+    $scope.subscription = undefined;
+    $scope.articles = undefined;
+
     authService.ensureLogin().success(function() {
         // Find the feed corresponding to the URL parameter
-        var subscription = undefined;
         _.map(authService.user.subscriptions, function(s) {
             if (Slug.slugify(s.title) === $routeParams.titleSlug)
-                subscription = s;
+                $scope.subscription = s;
         });
-        if (subscription === undefined)
+        if ($scope.subscription === undefined)
             $location.path('/subscriptions');
-        subscriptionsService.get(subscription.xmlUrl).success(function(data) {
+
+        subscriptionsService.get($scope.subscription.xmlUrl).success(function(data) {
             $scope.articles = data;
+
+            _.map($scope.articles, function(article) {
+                article.unread = _.contains($scope.subscription.unread, article.guid);
+            })
         });
     });
 });
