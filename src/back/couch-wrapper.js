@@ -120,7 +120,10 @@ function updateUser(user) {
         if (!user.password) {
             user.password = u.password;
         }
-        return doPUT(DBNAME + '/' + user.login, user);
+        return doPUT(DBNAME + '/' + user.login, user)
+        .then(function () {
+            return cleanUser(user);
+        });
     });
 }
 

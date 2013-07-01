@@ -197,6 +197,47 @@ The updated user.
 
 Status: 20O OK
 
+#### Cancel a subscription
+
+    DELETE /user/feeds/:feed_url
+
+##### Response
+
+The updated user.
+
+```json
+{
+  "login": "kikoo",
+  "subscriptions": [
+    {
+      "title": "LinuxFr.org : les journaux",
+      "description": null,
+      "link": "http://linuxfr.org/journaux",
+      "xmlUrl": "http://linuxfr.org/journaux.atom",
+      "unread": [
+        "tag:linuxfr.org,2005:Diary/34064",
+        "tag:linuxfr.org,2005:Diary/34063",
+        "tag:linuxfr.org,2005:Diary/34062",
+        "tag:linuxfr.org,2005:Diary/34061",
+        "tag:linuxfr.org,2005:Diary/34060",
+        "tag:linuxfr.org,2005:Diary/34059",
+        "tag:linuxfr.org,2005:Diary/34058",
+        "tag:linuxfr.org,2005:Diary/34057",
+        "tag:linuxfr.org,2005:Diary/34056",
+        "tag:linuxfr.org,2005:Diary/34055",
+        "tag:linuxfr.org,2005:Diary/34054",
+        "tag:linuxfr.org,2005:Diary/34053",
+        "tag:linuxfr.org,2005:Diary/34052",
+        "tag:linuxfr.org,2005:Diary/34051",
+        "tag:linuxfr.org,2005:Diary/34050"
+      ]
+    }
+  ]
+}
+```
+
+Status: 20O OK
+
 #### Get authenticated user's subscriptions
 
     GET /user/feeds

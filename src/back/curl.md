@@ -20,6 +20,10 @@
 
 	curl -X PUT -b'token=token' 'http://127.0.0.1:3000/user/feeds/http%3A%2F%2Flinuxfr.org%2Fjournaux.atom' -D-
 
+## Cancel a subscription
+
+	 curl -X DELETE -b'token=token' 'http://127.0.0.1:3000/user/feeds/http%3A%2F%2Flinuxfr.org%2Fjournaux.atom' -D-
+
 ## Get subscription stories
 
 	curl -X GET -b'token=token' 'http://127.0.0.1:3000/user/feeds/http%3A%2F%2Flinuxfr.org%2Fjournaux.atom' -D-

@@ -204,5 +204,30 @@ app.put("\^\/user\/feeds\/*", function (request, response) {
 	}
 });
 
+/* cancel a subscription */
+app.delete("\^\/user\/feeds\/*", function (request, response) {
+	var feed_url = decodeURIComponent(request.params[0]);
+	if (users[request.cookies.token]) {
+		db.getUser({login: users[request.cookies.token]})
+		.then(function (user) {
+			console.log(user);
+			user.subscriptions = _.without(user.subscriptions, _.findWhere(user.subscriptions, {xmlUrl: feed_url}));
+			return db.updateUser(user)
+			.then(function () {
+				return user;
+			});
+		})
+		.then(
+			function (user) {
+				response.status(200).send(user);
+			}, function (error) {
+				response.status(403).send(error.message);
+			}
+		);
+	} else {
+		response.send(401);
+	}
+});
+
 app.listen(3000);
 console.log('Express started on port 3000');
