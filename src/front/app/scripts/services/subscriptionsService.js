@@ -24,6 +24,13 @@ angular.module('msgr')
                 withCredentials: true
             });
         },
+        delete: function(xmlUrl) {
+            return $http({
+                method: 'DELETE',
+                url: apiBaseUrl + '/user/feeds/' + encodeURIComponent(xmlUrl),
+                withCredentials: true
+            });
+        },
         read: function(xmlUrl, guid) {
             return $http({
                 method: 'POST',

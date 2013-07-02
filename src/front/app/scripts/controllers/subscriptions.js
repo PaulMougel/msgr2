@@ -12,6 +12,10 @@ angular.module('msgr')
         subscriptionsService.add($scope.xmlUrl).success(refreshSubscriptions);
     };
 
+    $scope.delete = function(subscription) {
+        subscriptionsService.delete(subscription.xmlUrl).success(refreshSubscriptions);
+    };
+
     // Initialization
     authService.ensureLogin().success(function() {
         refreshSubscriptions();

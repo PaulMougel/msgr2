@@ -4,7 +4,7 @@
     // Links inside the cells will fill the whole cell, the user
     // will be able to click anywhere inside the cell (including white space)
     // to go to the feed page. Useful especially for mobile devices.  
-    td a {
+    td:first-child a {
         display: block;
     }
 }

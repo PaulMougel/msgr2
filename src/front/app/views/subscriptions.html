@@ -11,8 +11,13 @@
                             <td>
                                 <a href="#/feed/{{ subscription.title | slugify }}">
                                     {{ subscription.title }}
-                                    <span class="label round pull-right">{{ subscription.unread.length }}</span>
                                 </a>
+                            </td>
+                            <td>
+                                <span class="label round">{{ subscription.unread.length }}</span>
+                            </td>
+                            <td>
+                                <a href="" class="label round alert" ng-click="delete(subscription)">-</span>
                             </td>
                         </tr>
                     </tbody>
