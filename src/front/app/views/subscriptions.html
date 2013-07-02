@@ -4,8 +4,11 @@
         <div class="large-offset-1 large-10 columns">
             <!-- List of existing subscriptions -->
             <div class="row">
-                <h1>Your subscriptions</h1>
-                <table class="feed-table-list">
+                <h1>
+                    Your subscriptions
+                    <small ng-show="subscriptions.length === 0">You have none yet :-(</small>
+                </h1>
+                <table class="feed-table-list" ng-show="subscriptions.length > 0">
                     <tbody>
                         <tr ng-repeat="subscription in subscriptions">
                             <td>
