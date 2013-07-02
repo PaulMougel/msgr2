@@ -1,6 +1,7 @@
 var http = require('http');
 var crypto = require('crypto');
 var deferred = require('deferred');
+var _ = require('underscore');
 var HOST = 'localhost';
 var PORT = 5984;
 var DBNAME = '/msgr';

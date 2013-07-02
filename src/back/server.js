@@ -234,15 +234,7 @@ app.put("\^\/user\/feeds\/*", function (request, response) {
 app.delete("\^\/user\/feeds\/*", function (request, response) {
 	var feed_url = decodeURIComponent(request.params[0]);
 	if (users[request.cookies.token]) {
-		db.getUser({login: users[request.cookies.token]})
-		.then(function (user) {
-			console.log(user);
-			user.subscriptions = _.without(user.subscriptions, _.findWhere(user.subscriptions, {xmlUrl: feed_url}));
-			return db.updateUser(user)
-			.then(function () {
-				return user;
-			});
-		})
+		db.unsubscribe({login: users[request.cookies.token]}, {xmlUrl: feed_url})
 		.then(
 			function (user) {
 				response.status(200).send(user);
