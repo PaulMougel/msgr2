@@ -114,16 +114,14 @@ function getUser(user) {
 function updateUser(user) {
     return doGET(DBNAME + '/' + user.login)
     .then(function (u) {
-        /* restore deleted fields */
+        // Restore deleted fields
         user._rev = u._rev;
         user.type = u.type;
-        if (!user.password) {
-            user.password = u.password;
-        }
+        user.password = !user.password ? u.password : hash(user.password);
         return doPUT(DBNAME + '/' + user.login, user)
-        .then(function () {
-            return cleanUser(user);
-        });
+    })
+    .then(function (user) {
+        return cleanUser(user);
     });
 }
 
