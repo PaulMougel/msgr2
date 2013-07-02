@@ -30,6 +30,13 @@ angular.module('msgr')
                 url: apiBaseUrl + '/user/feeds/' + encodeURIComponent(xmlUrl) + '/' + encodeURIComponent(guid) + '/read',
                 withCredentials: true
             });
+        },
+        unread: function(xmlUrl, guid) {
+            return $http({
+                method: 'POST',
+                url: apiBaseUrl + '/user/feeds/' + encodeURIComponent(xmlUrl) + '/' + encodeURIComponent(guid) + '/unread',
+                withCredentials: true
+            });
         }
     };
 });

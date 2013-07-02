@@ -2,10 +2,17 @@
 
 angular.module('msgr')
 .controller('FeedController', function ($scope, $routeParams, $location, authService, subscriptionsService, Slug) {
-    $scope.toggleRead = function(article) {
+    $scope.read = function(article) {
         subscriptionsService.read($scope.subscription.xmlUrl, article.guid).success(function() {
             article.unread = false;
             $scope.subscription.unread = _.without($scope.subscription.unread, article.guid);
+        });
+    };
+
+     $scope.unread = function(article) {
+        subscriptionsService.unread($scope.subscription.xmlUrl, article.guid).success(function() {
+            article.unread = true;
+            $scope.subscription.unread.push(article.guid);
         });
     };
 

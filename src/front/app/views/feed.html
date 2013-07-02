@@ -14,10 +14,10 @@
             <div class="section-container accordion" data-section="accordion">
                 <section ng-repeat="article in articles">
                     <p class="title" data-section-title>
-                        <a href="#" ng-click="toggleRead(article)">
+                        <a href="#" ng-click="read(article)">
                             {{ article.title }}
                             <span ng-show="article.unread" class="pull-right label round">u</span>
-                            <span ng-hide="article.unread" class="pull-right label round success">r</span>
+                            <span ng-hide="article.unread" class="pull-right label round success" ng-click="unread(article)">r</span>
                         </a>
                     </p>
                     <div class="content" data-section-content>
