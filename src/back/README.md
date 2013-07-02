@@ -34,26 +34,46 @@ User format:
 ```
 
 Available functions:
-- `signup({login:'foo', password:'bar'})`, where the password is plaintext (will be hashed by the function)
-- `signin({login:'foo', password:'bar'})`, where the password is plaintext (will be hashed by the function)
-- `getUser({login: 'foo'})` will return a user's informations (minus the password field)
-- `updateUser({login: 'foo', subscriptions: []})` will update the user (minus the password field if a new password is not provided, minus the type field)
+- `signup({login, password})`, where the password is plaintext (will be hashed by the function)
+- `signin({login, password})`, where the password is plaintext (will be hashed by the function). Returns a user object.
+- `getUser({login})`. Returns a user object.
+- `subscribe({login}, {title, xmlUrl})` will add a subscription for a user
+- `unsubscribe({login}, {xmlUrl})` will remove a subscription for a user
 
-### Subscriptions management
+### Feed management
 
-Subscription format:
+Feed format:
 ```json
 {
     "title",
     "description",
     "link", // Link to website
     "xmlUrl", // RSS URL
-    "unread": [] // list of unread stories identified by their guid
 }
 ```
 
 Available functions:
-- `addSubscription({login}, {title, description, link, xmlUrl})`
+- `addFeed({title, description, link, xmlUrl})`
+- `getFeed({xmlUrl})`, will return the corresponding field
+
+### Article management
+
+Article format:
+```json
+{
+    "title",
+    "description",
+    "link",
+    "pubdate",
+    "guid", // This is used as the unique article ID,
+    "feed" // xmlUrl of the article's feed 
+}
+```
+
+Available functions:
+- `addArticle({title, description, link, pubdate, guid})`
+- `getArticle({guid})`, will return the corresponding article
+- `getAllArticlesForFeed({xmlUrl})`, returns all the articles of a feed
 
 ## REST API
 

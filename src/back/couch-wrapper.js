@@ -73,6 +73,20 @@ function cleanUser(user) {
     return user;
 }
 
+function cleanFeed(feed) {
+    delete feed._id;
+    delete feed._rev;
+    delete feed.type;
+    return feed;
+}
+
+function cleanArticle(article) {
+    delete article._id;
+    delete article._rev;
+    delete article.type;
+    return article;
+}
+
 // Public API
 function signup(user) {
     user.type = 'user';
@@ -111,35 +125,68 @@ function getUser(user) {
     );
 }
 
-function updateUser(user) {
+function subscribe(user, feed) {
     return doGET(DBNAME + '/' + user.login)
-    .then(function (u) {
-        // Restore deleted fields
-        user._rev = u._rev;
-        user.type = u.type;
-        user.password = !user.password ? u.password : hash(user.password);
-        return doPUT(DBNAME + '/' + user.login, user)
-    })
     .then(function (user) {
-        return cleanUser(user);
+        user.subscriptions.push(feed);
+        return doPUT(DBNAME + '/' + user.login, user);
     });
 }
 
-function addSubscription(user, feed) {
+function unsubscribe(user, feed) {
     return doGET(DBNAME + '/' + user.login)
-    .then(
-        function (user) {
-            user.subscriptions.push(feed);
-            return doPUT(DBNAME + '/' + user.login, user)
-            .then(function (result) {
-                return cleanUser(user);
-            })
-        }
-    );
+    .then(function (user) {
+        user.subscriptions = _.filter(user.subscriptions, function(subscription) {
+            return subscription.xmlUrl !== feed.xmlUrl;
+        });
+        return doPUT(DBNAME + '/' + user.login, user);
+    });
+}
+
+function addFeed(feed) {
+    feed.type = 'feed';
+    return doPUT(DBNAME + '/' + encodeURIComponent(feed.xmlUrl), feed)
+    .then(function(feed) {
+        return cleanFeed(feed);
+    });
+}
+
+function getFeed(feed) {
+    return doGET(DBNAME + '/' + encodeURIComponent(feed.xmlUrl))
+    .then(function(feed) {
+        return cleanFeed(feed);
+    });
+}
+
+function addArticle(article) {
+    article.type = 'article';
+    return doPUT(DBNAME + '/' + encodeURIComponent(article.guid), article)
+    .then(function(article) {
+        return cleanArticle(article);
+    });
+}
+
+function getArticle(article) {
+    return doGET(DBNAME + '/' + encodeURIComponent(article.guid))
+    .then(function(article) {
+        return cleanArticle(article);
+    });
+}
+
+function getAllArticlesForFeed(feed) {
+    return doGET(DBNAME + '/_design/articles/_view/byFeed?key="' + encodeURIComponent(feed.xmlUrl) + '"')
+    .then(function(article) {
+        return cleanArticle(article);
+    });
 }
 
 exports.signup = signup;
 exports.signin = signin;
 exports.getUser = getUser;
-exports.updateUser = updateUser;
-exports.addSubscription = addSubscription;
+exports.subscribe = subscribe;
+exports.unsubscribe = unsubscribe;
+exports.addFeed = addFeed;
+exports.getFeed = getFeed;
+exports.addArticle = addArticle;
+exports.getArticle = getArticle;
+exports.getAllArticlesForFeed = getAllArticlesForFeed;
