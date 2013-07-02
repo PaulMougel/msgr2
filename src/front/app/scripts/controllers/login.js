@@ -19,7 +19,7 @@ angular.module('msgr')
             
             authService.signup(user)
             .success(function() {
-                $location.path('/stories/');
+                $location.path('/subscriptions/');
             })
             .error(function() {
                 alert('Signup failure!');
