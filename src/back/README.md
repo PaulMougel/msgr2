@@ -54,7 +54,7 @@ Feed format:
 
 Available functions:
 - `addFeed({title, description, link, xmlUrl})`
-- `getFeed({xmlUrl})`, will return the corresponding field
+- `getFeed({xmlUrl})`, will resolve to the corresponding feed
 
 ### Article management
 
@@ -72,8 +72,8 @@ Article format:
 
 Available functions:
 - `addArticle({title, description, link, pubdate, guid})`
-- `getArticle({guid})`, will return the corresponding article
-- `getAllArticlesForFeed({xmlUrl})`, returns all the articles of a feed
+- `getArticle({guid})`, will resolve to the corresponding article
+- `getAllArticlesForFeed({xmlUrl})`, resolves to all the articles of a feed
 
 ## REST API
 

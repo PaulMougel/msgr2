@@ -3,7 +3,7 @@
 var FeedParser = require("feedparser"), request = require("request"), deferred = require('deferred');
 
 function get_meta(url) {
-	var d = deferred(), meta = {}, guids = [];
+	var d = deferred(), meta = {};
 	request(url)
 		.on('error', function (error) {
 			d.reject(error);
@@ -21,11 +21,11 @@ function get_meta(url) {
 		.on('readable', function() {
 			var stream = this, item;
 			while (item = stream.read()) {
-				guids.push(item.guid);
+				// Do nothing, we don't actually care about
+				// the articles in this particular function
 			}
 		})
 		.on('end', function () {
-			meta.unread = guids;
 			d.resolve(meta);
 		});
 	return d.promise;

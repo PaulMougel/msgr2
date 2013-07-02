@@ -3,6 +3,7 @@ var feed = require("./feed-wrapper");
 
 var express = require("express");
 var crypto = require("crypto");
+var deferred = require("deferred");
 var _ = require("underscore");
 
 var app = express();
@@ -14,13 +15,13 @@ app.use(express.bodyParser());
 
 /* implement CORS */
 app.all("*", function (request, response, next) {
-  	if (request.method === "OPTIONS") {
-  		// set cors headers for preflight request
+	if (request.method === "OPTIONS") {
+		// set cors headers for preflight request
 		if (request.get("Origin")) {
-            response.set("Access-Control-Allow-Origin", request.get("Origin"));
-            response.set("Access-Control-Allow-Credentials", "true");
-            response.set("Access-Control-Allow-Methods", "PUT, PATCH, DELETE");
-            response.set("Access-Control-Allow-Headers", "accept, access-control-allow-credentials, x-requested-with, origin, content-type");
+			response.set("Access-Control-Allow-Origin", request.get("Origin"));
+			response.set("Access-Control-Allow-Credentials", "true");
+			response.set("Access-Control-Allow-Methods", "PUT, PATCH, DELETE");
+			response.set("Access-Control-Allow-Headers", "accept, access-control-allow-credentials, x-requested-with, origin, content-type");
 			return response.send(200);
 		} else {
 			return response.send(400);
@@ -29,11 +30,11 @@ app.all("*", function (request, response, next) {
 	} else {
 		// set CORS headers for actual request
 		if (request.get("Origin")) {
-            response.set("Access-Control-Allow-Origin", request.get("Origin"));
-            response.set("Access-Control-Allow-Credentials", "true");
-        }
-    }
-  	next();
+			response.set("Access-Control-Allow-Origin", request.get("Origin"));
+			response.set("Access-Control-Allow-Credentials", "true");
+		}
+	}
+	next();
  });
 
 /* sign-in */
@@ -188,17 +189,42 @@ app.post("\^\/user\/feeds\/*\/*\/unread", function (request, response) {
 app.put("\^\/user\/feeds\/*", function (request, response) {
 	if (users[request.cookies.token]) {
 		var feed_url = decodeURIComponent(request.params[0]);
-		feed.get_meta(feed_url)
-		.then(function (meta) {
-			db.addSubscription({login: users[request.cookies.token]}, meta)
-			.then(function (user) {
-				response.status(200).send(user);
-			}, function (error) {
+
+		// Get feed OR (Add feed to database and get it)
+		var d = deferred();
+		db.getFeed({xmlUrl: feed_url})
+		.then(
+			function(feed) { // feed exists
+				d.resolve(feed);
+			},
+			function(err) {
+				if (err.message !== 'not_found') d.reject(err);
+
+				// Feed doesn't exist, we need to add it to the db
+				feed.get_meta(feed_url)
+				.then(db.addFeed)
+				.then(function() {
+					return db.getFeed({xmlUrl: feed_url})
+				}).then(function(feed) {
+					d.resolve(feed);
+				})
+				.catch(function(err) { d.reject(err)})
+			}
+		);
+		// Make the user subscribe to this feed
+		d.promise.then(
+			function (feed) {
+				db.subscribe({login: users[request.cookies.token]}, {title: feed.title, xmlUrl: feed.xmlUrl})
+				.then(function (user) {
+					response.status(200).send(user);
+				}, function (error) {
+					response.status(403).send(error.message);
+				});
+			}
+			, function (error) {
 				response.status(403).send(error.message);
-			});
-		}, function(error) {
-			response.status(403).send(error.message);
-		});
+			}
+		);
 	} else {
 		response.send(401);
 	}
