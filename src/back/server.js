@@ -103,7 +103,7 @@ app.get("/user/feeds", function (request, response) {
 app.get("\^\/user\/feeds\/*", function (request, response) {
 	var feed_url = decodeURIComponent(request.params[0]);
 	if (users[request.cookies.token]) {
-		feed.get_stories(feed_url)
+		db.getAllArticlesForFeed({xmlUrl: feed_url})
 		.then(function (data) {
 			if (request.query.filter === "unread") {
 				db.getUser({login: users[request.cookies.token]})

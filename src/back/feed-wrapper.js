@@ -49,7 +49,8 @@ function get_stories(url) {
 					description: item.description,
 					link: item.link,
 					pubdate: item.pubdate,
-					guid: item.guid
+					guid: item.guid,
+					feed: item.meta.xmlUrl
 				});
 
 			}

@@ -204,8 +204,10 @@ function getArticle(article) {
 
 function getAllArticlesForFeed(feed) {
     return doGET(DBNAME + '/_design/articles/_view/byFeed?key="' + encodeURIComponent(feed.xmlUrl) + '"')
-    .then(function(article) {
-        return cleanArticle(article);
+    .then(function(data) {
+        return _.map(data.rows, function (row) {
+            return cleanArticle(row.value);
+        });
     });
 }
 
