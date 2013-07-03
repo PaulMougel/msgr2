@@ -129,8 +129,12 @@ function getUser(user) {
 function subscribe(user, feed) {
     return doGET(DBNAME + '/' + user.login)
     .then(function (user) {
+        feed.unread = [];
         user.subscriptions.push(feed);
-        return doPUT(DBNAME + '/' + user.login, user);
+        return doPUT(DBNAME + '/' + user.login, user)
+        .then(function () {
+            return cleanUser(user);
+        });
     });
 }
 
@@ -140,7 +144,10 @@ function unsubscribe(user, feed) {
         user.subscriptions = _.filter(user.subscriptions, function(subscription) {
             return subscription.xmlUrl !== feed.xmlUrl;
         });
-        return doPUT(DBNAME + '/' + user.login, user);
+        return doPUT(DBNAME + '/' + user.login, user)
+        .then(function() {
+            return cleanUser(user);
+        });
     });
 }
 
@@ -156,6 +163,27 @@ function getFeed(feed) {
     return doGET(DBNAME + '/' + encodeURIComponent(feed.xmlUrl))
     .then(function(feed) {
         return cleanFeed(feed);
+    });
+}
+
+/* FIX ME WITH A MAP/REDUCE/WHATEVER FUNCTION */
+function getAllDocs() {
+    return doGET(DBNAME + '/_all_docs?include_docs=true')
+    .then(function (data) {
+        return data.rows;
+    });
+}
+
+function getAllFeeds() {
+    return getAllDocs()
+    .then(function (docs) {
+        return _.map(
+            _.filter(docs, function(doc) {
+                return doc.doc.type && doc.doc.type === "feed";
+            }), function (doc) {
+                return cleanFeed(doc.doc);
+            }
+        );
     });
 }
 
@@ -188,6 +216,7 @@ exports.subscribe = subscribe;
 exports.unsubscribe = unsubscribe;
 exports.addFeed = addFeed;
 exports.getFeed = getFeed;
+exports.getAllFeeds = getAllFeeds;
 exports.addArticle = addArticle;
 exports.getArticle = getArticle;
 exports.getAllArticlesForFeed = getAllArticlesForFeed;

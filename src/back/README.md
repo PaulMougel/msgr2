@@ -55,6 +55,7 @@ Feed format:
 Available functions:
 - `addFeed({title, description, link, xmlUrl})`
 - `getFeed({xmlUrl})`, will resolve to the corresponding feed
+- `getAllFeeds()`
 
 ### Article management
 
@@ -99,6 +100,8 @@ _Required_ **string**
 
 ##### Response
 
+  Created
+
 Status: 201 Created
 
 #### Sign-in
@@ -124,7 +127,8 @@ Status: 201 Created
       "link": "http://linuxfr.org/journaux",
       "xmlUrl": "http://linuxfr.org/journaux.atom"
     }
-  ]
+  ],
+  "token": "some_token"
 }
 ```
 
@@ -167,48 +171,14 @@ The updated user.
   "subscriptions": [
     {
       "title": "LinuxFr.org : les journaux",
-      "description": null,
-      "link": "http://linuxfr.org/journaux",
       "xmlUrl": "http://linuxfr.org/journaux.atom",
       "unread": [
-        "tag:linuxfr.org,2005:Diary/34064",
-        "tag:linuxfr.org,2005:Diary/34063",
-        "tag:linuxfr.org,2005:Diary/34062",
-        "tag:linuxfr.org,2005:Diary/34061",
-        "tag:linuxfr.org,2005:Diary/34060",
-        "tag:linuxfr.org,2005:Diary/34059",
-        "tag:linuxfr.org,2005:Diary/34058",
-        "tag:linuxfr.org,2005:Diary/34057",
-        "tag:linuxfr.org,2005:Diary/34056",
-        "tag:linuxfr.org,2005:Diary/34055",
-        "tag:linuxfr.org,2005:Diary/34054",
-        "tag:linuxfr.org,2005:Diary/34053",
-        "tag:linuxfr.org,2005:Diary/34052",
-        "tag:linuxfr.org,2005:Diary/34051",
-        "tag:linuxfr.org,2005:Diary/34050"
       ]
     },
     {
       "title": "LinuxFr.org : les journaux",
-      "description": null,
-      "link": "http://linuxfr.org/journaux",
       "xmlUrl": "http://linuxfr.org/journaux.atom",
       "unread": [
-        "tag:linuxfr.org,2005:Diary/34064",
-        "tag:linuxfr.org,2005:Diary/34063",
-        "tag:linuxfr.org,2005:Diary/34062",
-        "tag:linuxfr.org,2005:Diary/34061",
-        "tag:linuxfr.org,2005:Diary/34060",
-        "tag:linuxfr.org,2005:Diary/34059",
-        "tag:linuxfr.org,2005:Diary/34058",
-        "tag:linuxfr.org,2005:Diary/34057",
-        "tag:linuxfr.org,2005:Diary/34056",
-        "tag:linuxfr.org,2005:Diary/34055",
-        "tag:linuxfr.org,2005:Diary/34054",
-        "tag:linuxfr.org,2005:Diary/34053",
-        "tag:linuxfr.org,2005:Diary/34052",
-        "tag:linuxfr.org,2005:Diary/34051",
-        "tag:linuxfr.org,2005:Diary/34050"
       ]
     }
   ]
@@ -231,25 +201,8 @@ The updated user.
   "subscriptions": [
     {
       "title": "LinuxFr.org : les journaux",
-      "description": null,
-      "link": "http://linuxfr.org/journaux",
       "xmlUrl": "http://linuxfr.org/journaux.atom",
       "unread": [
-        "tag:linuxfr.org,2005:Diary/34064",
-        "tag:linuxfr.org,2005:Diary/34063",
-        "tag:linuxfr.org,2005:Diary/34062",
-        "tag:linuxfr.org,2005:Diary/34061",
-        "tag:linuxfr.org,2005:Diary/34060",
-        "tag:linuxfr.org,2005:Diary/34059",
-        "tag:linuxfr.org,2005:Diary/34058",
-        "tag:linuxfr.org,2005:Diary/34057",
-        "tag:linuxfr.org,2005:Diary/34056",
-        "tag:linuxfr.org,2005:Diary/34055",
-        "tag:linuxfr.org,2005:Diary/34054",
-        "tag:linuxfr.org,2005:Diary/34053",
-        "tag:linuxfr.org,2005:Diary/34052",
-        "tag:linuxfr.org,2005:Diary/34051",
-        "tag:linuxfr.org,2005:Diary/34050"
       ]
     }
   ]
@@ -268,8 +221,6 @@ Status: 20O OK
 [
   {
     "title": "LinuxFr.org : les journaux",
-    "description": null,
-    "link": "http://linuxfr.org/journaux",
     "xmlUrl": "http://linuxfr.org/journaux.atom"
   }
 ]
@@ -343,3 +294,13 @@ The updated user.
 ```
 
 Status: 200 OK
+
+#### Update feeds
+
+Fetch new articles for each feed. Development Only.
+
+  POST /feeds/update
+
+##### Response
+
+204 No Content

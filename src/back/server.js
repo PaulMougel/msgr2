@@ -156,7 +156,7 @@ app.post("\^\/user\/feeds\/*\/*\/read", function (request, response) {
 	}
 });
 
-/* mark an article as read */
+/* mark an article as unread */
 app.post("\^\/user\/feeds\/*\/*\/unread", function (request, response) {
 	var feed_url = decodeURIComponent(request.params[0]), story_guid = decodeURIComponent(request.params[1]);
 	if (users[request.cookies.token]) {
@@ -247,5 +247,34 @@ app.delete("\^\/user\/feeds\/*", function (request, response) {
 	}
 });
 
+function updateFeeds() {
+	return db.getAllFeeds()
+	.then(function (feeds) {
+		_.each(feeds, function (f) {
+			feed.get_stories(f.xmlUrl)
+			.then(function (stories) {
+				_.each(stories, function (story) {
+					db.addArticle(story);
+				});
+			});
+		});
+	});
+}
+
+/* we should not provide this API call in a production environment */
+app.post("/feeds/update", function (request, response) {
+	if (users[request.cookies.token]) {
+		updateFeeds()
+		.then(function () {
+			response.send(204);
+		}, function (error) {
+			response.status(400).send(error.message);
+		});
+	}
+});
+
 app.listen(3000);
 console.log('Express started on port 3000');
+
+/* updates every 30 mn */
+setInterval(updateFeeds, 1000*60*30);
