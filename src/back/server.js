@@ -250,15 +250,22 @@ app.delete("\^\/user\/feeds\/*", function (request, response) {
 function updateFeeds() {
 	return db.getAllFeeds()
 	.then(function (feeds) {
-		_.each(feeds, function (f) {
-			feed.get_stories(f.xmlUrl)
-			.then(function (stories) {
-				_.each(stories, function (story) {
+		return deferred.map(feeds, function(f) {
+			var subscribersPromise = db.getSubscribersForFeed(f);
+			var storiesPromise = feed.get_stories(f.xmlUrl);
+
+			deferred(subscribersPromise, storiesPromise)
+			.then(function(res) {
+				var subscribers = res[0];
+				var stories = res[1];
+
+				_.map(stories, function(story) {
+					story.unreadBy = subscribers;
 					db.addArticle(story);
 				});
 			});
 		});
-	});
+	})
 }
 
 /* we should not provide this API call in a production environment */

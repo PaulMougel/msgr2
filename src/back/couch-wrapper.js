@@ -129,7 +129,6 @@ function getUser(user) {
 function subscribe(user, feed) {
     return doGET(DBNAME + '/' + user.login)
     .then(function (user) {
-        feed.unread = [];
         user.subscriptions.push(feed);
         return doPUT(DBNAME + '/' + user.login, user)
         .then(function () {
@@ -199,6 +198,13 @@ function getAllArticlesForFeed(feed) {
     });
 }
 
+function getSubscribersForFeed(feed) {
+    return doGET(DBNAME + '/_design/feeds/_view/subscribersByFeed?key="' + encodeURIComponent(feed.xmlUrl) + '"')
+    .then(function (s) {
+        return _.pluck(s.rows, 'value'); // extract subscribers's id
+    })
+}
+
 exports.signup = signup;
 exports.signin = signin;
 exports.getUser = getUser;
@@ -210,3 +216,4 @@ exports.getAllFeeds = getAllFeeds;
 exports.addArticle = addArticle;
 exports.getArticle = getArticle;
 exports.getAllArticlesForFeed = getAllArticlesForFeed;
+exports.getSubscribersForFeed = getSubscribersForFeed;
