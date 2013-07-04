@@ -270,6 +270,8 @@ app.post("/feeds/update", function (request, response) {
 		}, function (error) {
 			response.status(400).send(error.message);
 		});
+	} else {
+		response.send(401);
 	}
 });
 
