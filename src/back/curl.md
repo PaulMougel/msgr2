@@ -38,4 +38,4 @@
 
 ## Update feeds
 
-	 curl -X POST -b'token=token' 'http://127.0.0.1:3000/feeds/update' -D-
+	curl -X POST -b'token=token' 'http://127.0.0.1:3000/feeds/update' -D-

@@ -128,6 +128,17 @@ app.get("\^\/user\/feeds\/*", function (request, response) {
 	}
 });
 
+function addUnreads(user, subscription, new_stories) {
+	var unread = _.find(user.subscriptions, function (s) {
+		return (subscription.xmlUrl === s.xmlUrl)
+	}).unread, guids = _.map(new_stories, function(story) {
+		return story.guid;
+	});
+	unread = _.union(unread, guids);
+	user.subscriptions[_.indexOf(user.subscriptions, _.findWhere(user.subscriptions, {xmlUrl: subscription.xmlUrl}))].unread = unread;
+	return user;
+}
+
 /* mark an article as read */
 app.post("\^\/user\/feeds\/*\/*\/read", function (request, response) {
 	var feed_url = decodeURIComponent(request.params[0]), story_guid = decodeURIComponent(request.params[1]);
@@ -168,10 +179,7 @@ app.post("\^\/user\/feeds\/*\/*\/unread", function (request, response) {
 			story_array.push(story_guid);
 			unread = _.union(unread, story_array);
 			user.subscriptions[_.indexOf(user.subscriptions, _.findWhere(user.subscriptions, {xmlUrl: feed_url}))].unread = unread;
-			return db.updateUser(user)
-			.then(function () {
-				return user;
-			});
+			return db.updateUser(user);
 		})
 		.then(
 			function (user) {
@@ -247,36 +255,54 @@ app.delete("\^\/user\/feeds\/*", function (request, response) {
 	}
 });
 
+/* 
+ * updateFeeds() returns immediately, in order to end the request.
+ * It should sequentially process each feed 
+ */
 function updateFeeds() {
-	return db.getAllFeeds()
+	db.getAllFeeds()
 	.then(function (feeds) {
-		return deferred.map(feeds, function(f) {
-			var subscribersPromise = db.getSubscribersForFeed(f);
-			var storiesPromise = feed.get_stories(f.xmlUrl);
-
-			deferred(subscribersPromise, storiesPromise)
-			.then(function(res) {
-				var subscribers = res[0];
-				var stories = res[1];
-
-				_.map(stories, function(story) {
-					story.unreadBy = subscribers;
-					db.addArticle(story);
+		_.each(feeds, function (f) {
+			feed.get_stories(f.xmlUrl)
+			.then(function (stories) {
+				return deferred.map(stories, function (story) {
+					return db.addArticle(story)
+					.then(
+						function () {
+							console.log(" + added " + story.title);
+							return story;
+						}, function (error) {
+							console.log(" - failed to add " + story.title + "("+error.message+")");
+							return undefined;
+						}
+					);
+				})
+				.then(function (new_stories) {
+					return _.filter(new_stories, function(story) {
+						return story !== undefined;
+					});
+				});
+			})
+			/* update individual unread status */
+			.then(function (new_stories) {
+				db.getSubscribersForFeed(f)
+				.then(function (users) {
+					return deferred.map(users, function (user) {
+						console.log("... adding unreads for " + user.login);
+						new_user = addUnreads(user, f, new_stories);
+						db.updateUser(new_user);
+					});
 				});
 			});
 		});
-	})
+	});
 }
 
 /* we should not provide this API call in a production environment */
 app.post("/feeds/update", function (request, response) {
 	if (users[request.cookies.token]) {
-		updateFeeds()
-		.then(function () {
-			response.send(204);
-		}, function (error) {
-			response.status(400).send(error.message);
-		});
+		updateFeeds();
+		response.send(204);
 	} else {
 		response.send(401);
 	}

@@ -150,6 +150,20 @@ function unsubscribe(user, feed) {
     });
 }
 
+function updateUser(user) {
+    return doGET(DBNAME + '/' + user.login)
+    .then(function (u) {
+        // Restore deleted fields
+        user._rev = u._rev;
+        user.type = u.type;
+        user.password = !user.password ? u.password : hash(user.password);
+        return doPUT(DBNAME + '/' + user.login, user)
+    })
+    .then(function () {
+        return cleanUser(user);
+    });
+}
+
 function addFeed(feed) {
     feed.type = 'feed';
     return doPUT(DBNAME + '/' + encodeURIComponent(feed.xmlUrl), feed)
@@ -201,7 +215,9 @@ function getAllArticlesForFeed(feed) {
 function getSubscribersForFeed(feed) {
     return doGET(DBNAME + '/_design/feeds/_view/subscribersByFeed?key="' + encodeURIComponent(feed.xmlUrl) + '"')
     .then(function (s) {
-        return _.pluck(s.rows, 'value'); // extract subscribers's id
+        return _.map(s.rows, function (row) {
+            return cleanUser(row.value); // extract subscribers's id
+        });
     })
 }
 
@@ -210,6 +226,7 @@ exports.signin = signin;
 exports.getUser = getUser;
 exports.subscribe = subscribe;
 exports.unsubscribe = unsubscribe;
+exports.updateUser = updateUser;
 exports.addFeed = addFeed;
 exports.getFeed = getFeed;
 exports.getAllFeeds = getAllFeeds;
