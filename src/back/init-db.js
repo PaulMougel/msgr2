@@ -60,52 +60,60 @@ function doGET(url) {
 };
 
 function createDb() {
-    return doPUT(DBNAME, {})
-};
+    var d = deferred();
 
-function createView() {
-    var _rev = undefined;
-    
-    return doGET(DBNAME + '/_design/articles')
-    .then(function(res) {
-        _rev = res._rev;
-    })
-    .finally(function() {
-        var couchViews = require("./couch-views");
-        couchViews._rev = _rev;
-        return doPUT(DBNAME + '/_design/articles', couchViews)
-        .then(
-            function(res) {
-                console.log("Views created or updated");
-            },
-            function(err) {
-                console.log("Views creation failed: " + err.message);
-            }
-        );
-    })
-};
-
-function initDb() {
-    var p = createDb();
-    
-    p.then(
+    console.log('Creating database...')
+    doPUT(DBNAME, {})
+    .then(
         function() {
-            console.log("Database created");
-            return createView();
-        },
-        function(err) {
-            if (err.message === "file_exists") {
-                console.log("Database already exists");
-                return createView();
+            console.log('Database created');
+            d.resolve();
+        }, function(err) {
+            if (err.message === 'file_exists') {
+                console.log('Database already exists');
+                d.resolve();
             }
             else {
-                console.log("Database creation failed: " + err);
-                return p;
+                console.log('Database creation failed: ' + err);
+                d.reject();
             }
         }
     );
 
-    return p;
+    return d.promise;
+};
+
+function createView(couchUrl, filename) {
+    var _rev = undefined;
+    
+    var d = deferred();
+
+    doGET(DBNAME + couchUrl)
+    .then(function(res) {
+        _rev = res._rev;
+    })
+    .finally(function() {
+        var couchViews = require(filename);
+        couchViews._rev = _rev;
+        doPUT(DBNAME + couchUrl, couchViews)
+        .then(
+            function(res) {
+                console.log('View' + couchUrl + ' created or updated');
+                d.resolve();
+            },
+            function(err) {
+                console.log('View' + couchUrl + ' creation failed: ' + err.message);
+                d.reject();
+            }
+        );
+    });
+
+    return d.promise;
+};
+
+function initDb() {
+    return createDb()
+    .then(function() { createView('/_design/articles', './couch-views-articles');} )
 }
 
 initDb();
