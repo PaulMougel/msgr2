@@ -166,24 +166,12 @@ function getFeed(feed) {
     });
 }
 
-/* FIX ME WITH A MAP/REDUCE/WHATEVER FUNCTION */
-function getAllDocs() {
-    return doGET(DBNAME + '/_all_docs?include_docs=true')
-    .then(function (data) {
-        return data.rows;
-    });
-}
-
 function getAllFeeds() {
-    return getAllDocs()
+    return doGET(DBNAME + '/_design/feeds/_view/all')
     .then(function (docs) {
-        return _.map(
-            _.filter(docs, function(doc) {
-                return doc.doc.type && doc.doc.type === "feed";
-            }), function (doc) {
-                return cleanFeed(doc.doc);
-            }
-        );
+        return _.map(docs.rows, function(row) {
+            return cleanFeed(row.value);
+        });
     });
 }
 
