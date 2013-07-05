@@ -1,0 +1,20 @@
+<div class="row" ng-controller="ImportOpmlController">
+    <div class="large-offset-3 large-6 columns">
+        <form ng-submit="import()">
+            <fieldset>
+                <legend>Import your OPML file</legend>
+
+                <div class="row">
+                    <div class="large-12 columns">
+                        <input type="file" onchange="angular.element(this).scope().upload(this)" accept=".xml">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="large-12 columns">
+                        <button type="submit" class="large expand">Import</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</div>

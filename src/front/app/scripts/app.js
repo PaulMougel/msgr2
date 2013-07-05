@@ -12,6 +12,9 @@ angular.module('msgr', ['xml', 'slugifier'])
     .when('/feed/:titleSlug', {
         templateUrl: 'views/feed.html',
     })
+    .when('/import-opml', {
+        templateUrl: 'views/import-opml.html',
+    })
     .otherwise({
         templateUrl: 'views/404.html'
     });
