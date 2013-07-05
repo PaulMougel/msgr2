@@ -34,11 +34,13 @@ User format:
 ```
 
 Available functions:
-- `signup({login, password})`, where the password is plaintext (will be hashed by the function)
-- `signin({login, password})`, where the password is plaintext (will be hashed by the function). Returns a user object.
-- `getUser({login})`. Returns a user object.
+- `signup({login, password})`, where the password is plaintext (will be hashed by the function). Resolves to a user object.
+- `signin({login, password})`, where the password is plaintext (will be hashed by the function). Resolves to a user object.
+- `getUser({login})`. Resolves to a user object.
+- `getAllUsers({login})`. Resolves to a list of user objects.
 - `subscribe({login}, {title, xmlUrl})` will add a subscription for a user
 - `unsubscribe({login}, {xmlUrl})` will remove a subscription for a user
+- `updateUser({…})` will update the user in the database and resolve to the updated user
 
 ### Feed management
 
@@ -55,7 +57,8 @@ Feed format:
 Available functions:
 - `addFeed({title, description, link, xmlUrl})`
 - `getFeed({xmlUrl})`, will resolve to the corresponding feed
-- `getAllFeeds()`
+- `getAllFeeds()`, will resolve to a list of feeds
+- `getSubscribersForFeed({xmlUrl})`, will resolve to a list of users that subscribe to a particular feed
 
 ### Article management
 
