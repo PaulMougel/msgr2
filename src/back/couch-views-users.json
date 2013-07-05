@@ -1,0 +1,8 @@
+{
+    "_id" : "_design/users",
+    "views" : {
+        "all": {
+            "map": "function(doc) { if (doc.type === 'user') emit(doc._id, doc); }"
+        }
+    }
+}

@@ -126,6 +126,15 @@ function getUser(user) {
     );
 }
 
+function getAllUsers() {
+    return doGET(DBNAME + '/_design/users/_view/all')
+    .then(function (docs) {
+        return _.map(docs.rows, function(row) {
+            return cleanUser(row.value);
+        });
+    });
+}
+
 function subscribe(user, feed) {
     return doGET(DBNAME + '/' + user.login)
     .then(function (user) {
@@ -224,6 +233,7 @@ function getSubscribersForFeed(feed) {
 exports.signup = signup;
 exports.signin = signin;
 exports.getUser = getUser;
+exports.getAllUsers = getAllUsers;
 exports.subscribe = subscribe;
 exports.unsubscribe = unsubscribe;
 exports.updateUser = updateUser;

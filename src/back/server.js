@@ -260,40 +260,44 @@ app.delete("\^\/user\/feeds\/*", function (request, response) {
  * It should sequentially process each feed 
  */
 function updateFeeds() {
-	db.getAllFeeds()
+	// Retrieve all feeds
+	var newStoriesByFeed = db.getAllFeeds()
 	.then(function (feeds) {
-		_.each(feeds, function (f) {
-			feed.get_stories(f.xmlUrl)
+		return deferred.map(feeds, function (f) {
+			return feed.get_stories(f.xmlUrl)
 			.then(function (stories) {
 				return deferred.map(stories, function (story) {
-					return db.addArticle(story)
-					.then(
-						function () {
-							console.log(" + added " + story.title);
-							return story;
-						}, function (error) {
-							console.log(" - failed to add " + story.title + "("+error.message+")");
-							return undefined;
-						}
+					return db.addArticle(story).then(
+						function () { return story; },
+						function () { return undefined; }
 					);
 				})
-				.then(function (new_stories) {
-					return _.filter(new_stories, function(story) {
+				.then(function (stories) {
+					var newStories = _.filter(stories, function (story) {
 						return story !== undefined;
 					});
-				});
-			})
-			/* update individual unread status */
-			.then(function (new_stories) {
-				db.getSubscribersForFeed(f)
-				.then(function (users) {
-					return deferred.map(users, function (user) {
-						console.log("... adding unreads for " + user.login);
-						new_user = addUnreads(user, f, new_stories);
-						db.updateUser(new_user);
-					});
+					return {newStories: _.pluck(newStories, 'guid'), feed: f.xmlUrl};
 				});
 			});
+		});
+	});
+
+	// Retrieve all users
+	var allUsers = db.getAllUsers();
+
+	// When we have both, add all new stories to the unread list of a user,
+	// then update him (user object is then updated only once per API call)
+	return deferred(newStoriesByFeed, allUsers)
+	.then(function (data) {
+		var newStoriesByFeed = data[0];
+		var allUsers = data[1];
+
+		return deferred.map(allUsers, function (user) {
+			_.map(user.subscriptions, function (subscription) {
+				var unreadGuid = _.findWhere(newStoriesByFeed, {feed: subscription.xmlUrl}).newStories;
+				subscription.unread = _.union(subscription.unread, unreadGuid);
+			});
+			return db.updateUser(user);
 		});
 	});
 }
@@ -301,7 +305,11 @@ function updateFeeds() {
 /* we should not provide this API call in a production environment */
 app.post("/feeds/update", function (request, response) {
 	if (users[request.cookies.token]) {
-		updateFeeds();
+		updateFeeds()
+		.then(
+			function () {console.log('Feed update: Success')},
+			function (err) {console.log('Feed update: Error, ' + err.message)}
+		);
 		response.send(204);
 	} else {
 		response.send(401);
