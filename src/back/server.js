@@ -128,17 +128,6 @@ app.get("\^\/user\/feeds\/*", function (request, response) {
 	}
 });
 
-function addUnreads(user, subscription, new_stories) {
-	var unread = _.find(user.subscriptions, function (s) {
-		return (subscription.xmlUrl === s.xmlUrl)
-	}).unread, guids = _.map(new_stories, function(story) {
-		return story.guid;
-	});
-	unread = _.union(unread, guids);
-	user.subscriptions[_.indexOf(user.subscriptions, _.findWhere(user.subscriptions, {xmlUrl: subscription.xmlUrl}))].unread = unread;
-	return user;
-}
-
 /* mark an article as read */
 app.post("\^\/user\/feeds\/*\/*\/read", function (request, response) {
 	var feed_url = decodeURIComponent(request.params[0]), story_guid = decodeURIComponent(request.params[1]);
