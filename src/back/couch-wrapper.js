@@ -138,6 +138,7 @@ function getAllUsers() {
 function subscribe(user, feed) {
     return doGET(DBNAME + '/' + user.login)
     .then(function (user) {
+        feed.unread = [];
         user.subscriptions.push(feed);
         return doPUT(DBNAME + '/' + user.login, user)
         .then(function () {
