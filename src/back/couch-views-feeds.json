@@ -1,0 +1,11 @@
+{
+    "_id" : "_design/feeds",
+    "views" : {
+        "all": {
+            "map": "function(doc) { if (doc.type === 'feed') emit(doc._id, doc); }"
+        },
+        "subscribersByFeed": {
+            "map": "function(doc) { if (doc.type === 'user') { var i; for (i=0;i<doc.subscriptions.length;i++) emit(doc.subscriptions[i].xmlUrl, doc) } }"
+        }
+    }
+}

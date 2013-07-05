@@ -34,26 +34,47 @@ User format:
 ```
 
 Available functions:
-- `signup({login:'foo', password:'bar'})`, where the password is plaintext (will be hashed by the function)
-- `signin({login:'foo', password:'bar'})`, where the password is plaintext (will be hashed by the function)
-- `getUser({login: 'foo'})` will return a user's informations (minus the password field)
-- `updateUser({login: 'foo', subscriptions: []})` will update the user (minus the password field if a new password is not provided, minus the type field)
+- `signup({login, password})`, where the password is plaintext (will be hashed by the function)
+- `signin({login, password})`, where the password is plaintext (will be hashed by the function). Returns a user object.
+- `getUser({login})`. Returns a user object.
+- `subscribe({login}, {title, xmlUrl})` will add a subscription for a user
+- `unsubscribe({login}, {xmlUrl})` will remove a subscription for a user
 
-### Subscriptions management
+### Feed management
 
-Subscription format:
+Feed format:
 ```json
 {
     "title",
     "description",
     "link", // Link to website
     "xmlUrl", // RSS URL
-    "unread": [] // list of unread stories identified by their guid
 }
 ```
 
 Available functions:
-- `addSubscription({login}, {title, description, link, xmlUrl})`
+- `addFeed({title, description, link, xmlUrl})`
+- `getFeed({xmlUrl})`, will resolve to the corresponding feed
+- `getAllFeeds()`
+
+### Article management
+
+Article format:
+```json
+{
+    "title",
+    "description",
+    "link",
+    "pubdate",
+    "guid", // This is used as the unique article ID,
+    "feed" // xmlUrl of the article's feed 
+}
+```
+
+Available functions:
+- `addArticle({title, description, link, pubdate, guid})`
+- `getArticle({guid})`, will resolve to the corresponding article
+- `getAllArticlesForFeed({xmlUrl})`, resolves to all the articles of a feed
 
 ## REST API
 
@@ -78,6 +99,8 @@ _Required_ **string**
 _Required_ **string**
 
 ##### Response
+
+  Created
 
 Status: 201 Created
 
@@ -104,7 +127,8 @@ Status: 201 Created
       "link": "http://linuxfr.org/journaux",
       "xmlUrl": "http://linuxfr.org/journaux.atom"
     }
-  ]
+  ],
+  "token": "some_token"
 }
 ```
 
@@ -147,48 +171,14 @@ The updated user.
   "subscriptions": [
     {
       "title": "LinuxFr.org : les journaux",
-      "description": null,
-      "link": "http://linuxfr.org/journaux",
       "xmlUrl": "http://linuxfr.org/journaux.atom",
       "unread": [
-        "tag:linuxfr.org,2005:Diary/34064",
-        "tag:linuxfr.org,2005:Diary/34063",
-        "tag:linuxfr.org,2005:Diary/34062",
-        "tag:linuxfr.org,2005:Diary/34061",
-        "tag:linuxfr.org,2005:Diary/34060",
-        "tag:linuxfr.org,2005:Diary/34059",
-        "tag:linuxfr.org,2005:Diary/34058",
-        "tag:linuxfr.org,2005:Diary/34057",
-        "tag:linuxfr.org,2005:Diary/34056",
-        "tag:linuxfr.org,2005:Diary/34055",
-        "tag:linuxfr.org,2005:Diary/34054",
-        "tag:linuxfr.org,2005:Diary/34053",
-        "tag:linuxfr.org,2005:Diary/34052",
-        "tag:linuxfr.org,2005:Diary/34051",
-        "tag:linuxfr.org,2005:Diary/34050"
       ]
     },
     {
       "title": "LinuxFr.org : les journaux",
-      "description": null,
-      "link": "http://linuxfr.org/journaux",
       "xmlUrl": "http://linuxfr.org/journaux.atom",
       "unread": [
-        "tag:linuxfr.org,2005:Diary/34064",
-        "tag:linuxfr.org,2005:Diary/34063",
-        "tag:linuxfr.org,2005:Diary/34062",
-        "tag:linuxfr.org,2005:Diary/34061",
-        "tag:linuxfr.org,2005:Diary/34060",
-        "tag:linuxfr.org,2005:Diary/34059",
-        "tag:linuxfr.org,2005:Diary/34058",
-        "tag:linuxfr.org,2005:Diary/34057",
-        "tag:linuxfr.org,2005:Diary/34056",
-        "tag:linuxfr.org,2005:Diary/34055",
-        "tag:linuxfr.org,2005:Diary/34054",
-        "tag:linuxfr.org,2005:Diary/34053",
-        "tag:linuxfr.org,2005:Diary/34052",
-        "tag:linuxfr.org,2005:Diary/34051",
-        "tag:linuxfr.org,2005:Diary/34050"
       ]
     }
   ]
@@ -211,25 +201,8 @@ The updated user.
   "subscriptions": [
     {
       "title": "LinuxFr.org : les journaux",
-      "description": null,
-      "link": "http://linuxfr.org/journaux",
       "xmlUrl": "http://linuxfr.org/journaux.atom",
       "unread": [
-        "tag:linuxfr.org,2005:Diary/34064",
-        "tag:linuxfr.org,2005:Diary/34063",
-        "tag:linuxfr.org,2005:Diary/34062",
-        "tag:linuxfr.org,2005:Diary/34061",
-        "tag:linuxfr.org,2005:Diary/34060",
-        "tag:linuxfr.org,2005:Diary/34059",
-        "tag:linuxfr.org,2005:Diary/34058",
-        "tag:linuxfr.org,2005:Diary/34057",
-        "tag:linuxfr.org,2005:Diary/34056",
-        "tag:linuxfr.org,2005:Diary/34055",
-        "tag:linuxfr.org,2005:Diary/34054",
-        "tag:linuxfr.org,2005:Diary/34053",
-        "tag:linuxfr.org,2005:Diary/34052",
-        "tag:linuxfr.org,2005:Diary/34051",
-        "tag:linuxfr.org,2005:Diary/34050"
       ]
     }
   ]
@@ -248,8 +221,6 @@ Status: 20O OK
 [
   {
     "title": "LinuxFr.org : les journaux",
-    "description": null,
-    "link": "http://linuxfr.org/journaux",
     "xmlUrl": "http://linuxfr.org/journaux.atom"
   }
 ]
@@ -323,3 +294,13 @@ The updated user.
 ```
 
 Status: 200 OK
+
+#### Update feeds
+
+Fetch new articles for each feed. Development Only.
+
+  POST /feeds/update
+
+##### Response
+
+204 No Content
