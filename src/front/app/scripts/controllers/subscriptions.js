@@ -9,7 +9,9 @@ angular.module('msgr')
     };
 
     $scope.add = function() {
-        subscriptionsService.add($scope.xmlUrl).success(refreshSubscriptions);
+        subscriptionsService.add($scope.xmlUrl)
+        .success(refreshSubscriptions)
+        .error(alert);
     };
 
     $scope.delete = function(subscription) {

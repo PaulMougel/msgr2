@@ -16,6 +16,9 @@ function get_meta(url) {
 			meta.title = data.title;
 			meta.description = data.description;
 			meta.link = data.link;
+
+			if (data.xmlUrl === null)
+				d.reject(new Error('Bad feed! (xmlUrl === null)'));
 			meta.xmlUrl = data.xmlUrl;
 		})
 		.on('readable', function() {
