@@ -1,0 +1,6 @@
+.article-list section p.title a { // Article title
+    // Instead of overflowing to the right of the table
+    // display instead '…' at the end of the line
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+}

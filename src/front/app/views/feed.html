@@ -11,13 +11,13 @@
     <div class="row">
         <div class="large-offset-1 large-10-columns">
             <!-- List of feed articles -->
-            <div class="section-container accordion" data-section="accordion">
+            <div class="section-container accordion article-list" data-section="accordion">
                 <section ng-repeat="article in articles">
                     <p class="title" data-section-title>
                         <a href="#" ng-click="read(article)">
-                            {{ article.title }}
                             <span ng-show="article.unread" class="pull-right label round">u</span>
                             <span ng-hide="article.unread" class="pull-right label round success" ng-click="unread(article)">r</span>
+                            {{ article.title }}
                         </a>
                     </p>
                     <div class="content" data-section-content>
