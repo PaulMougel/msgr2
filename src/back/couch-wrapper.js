@@ -177,7 +177,7 @@ function updateUser(user) {
 function addFeed(feed) {
     feed.type = 'feed';
     return doPUT(DBNAME + '/' + encodeURIComponent(feed.xmlUrl), feed)
-    .then(function(feed) {
+    .then(function () {
         return cleanFeed(feed);
     });
 }

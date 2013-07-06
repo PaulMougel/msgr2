@@ -199,13 +199,15 @@ app.put("\^\/user\/feeds\/*", function (request, response) {
 
 				// Feed doesn't exist, we need to add it to the db
 				feed.get_meta(feed_url)
-				.then(db.addFeed)
-				.then(function() {
-					return db.getFeed({xmlUrl: feed_url})
-				}).then(function(feed) {
-					d.resolve(feed);
+				.then(function (feed) {
+					return db.addFeed(feed);
 				})
-				.catch(function(err) { d.reject(err)})
+				.then(function (f) {
+					d.resolve(f);
+				})
+				.catch(function (err) { 
+					d.reject(err)
+				});
 			}
 		);
 		// Make the user subscribe to this feed
