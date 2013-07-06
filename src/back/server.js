@@ -249,13 +249,16 @@ app.delete("\^\/user\/feeds\/*", function (request, response) {
  * It should sequentially process each feed 
  */
 function updateFeeds() {
+	console.log("update...");
 	// Retrieve all feeds
 	var newStoriesByFeed = db.getAllFeeds()
 	.then(function (feeds) {
 		return deferred.map(feeds, function (f) {
+			console.log("... fetching " + f.title);
 			return feed.get_stories(f.xmlUrl)
 			.then(function (stories) {
 				return deferred.map(stories, function (story) {
+					console.log("... ... found " + story.title);
 					return db.addArticle(story).then(
 						function () { return story; },
 						function () { return undefined; }
@@ -278,6 +281,7 @@ function updateFeeds() {
 	// then update him (user object is then updated only once per API call)
 	return deferred(newStoriesByFeed, allUsers)
 	.then(function (data) {
+		console.log("... done")
 		var newStoriesByFeed = data[0];
 		var allUsers = data[1];
 

@@ -5,32 +5,23 @@ var FeedParser = require("feedparser"), request = require("request"), deferred =
 function get_meta(url) {
 	var d = deferred(), meta = {};
 	request(url)
-		.on('error', function (error) {
-			d.reject(error);
-		})
+	.on('error', function (error) {
+		console.log("Unable to get metas of " + url);
+		console.log(error);
+		d.reject(error);
+	})
 	.pipe(new FeedParser())
-		.on('error', function (error) {
-			d.reject(error);
-		})
-		.on('meta', function (data) {
-			meta.title = data.title;
-			meta.description = data.description;
-			meta.link = data.link;
-
-			if (data.xmlUrl === null)
-				d.reject(new Error('Bad feed! (xmlUrl === null)'));
-			meta.xmlUrl = data.xmlUrl;
-		})
-		.on('readable', function() {
-			var stream = this, item;
-			while (item = stream.read()) {
-				// Do nothing, we don't actually care about
-				// the articles in this particular function
-			}
-		})
-		.on('end', function () {
-			d.resolve(meta);
-		});
+	.on('error', function (error) {
+		d.reject(error);
+	})
+	.on('meta', function (data) {
+		meta.title = data.title;
+		meta.description = data.description;
+		meta.link = data.link;
+		/* prevent missing, malformed or bad self link */
+		meta.xmlUrl = url;
+		d.resolve(meta);
+	});
 	return d.promise;
 }
 
@@ -42,6 +33,8 @@ function get_stories(url) {
 		})
 	.pipe(new FeedParser())
 		.on('error', function (error) {
+			console.log("Unable to get stories of " + url);
+			console.log(error);
 			d.reject(error);
 		})
 		.on('readable', function() {
@@ -53,7 +46,7 @@ function get_stories(url) {
 					link: item.link,
 					pubdate: item.pubdate,
 					guid: item.guid,
-					feed: item.meta.xmlUrl
+					feed: url
 				});
 
 			}
