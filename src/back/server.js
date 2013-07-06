@@ -186,26 +186,34 @@ app.post("\^\/user\/feeds\/*\/*\/unread", function (request, response) {
 app.put("\^\/user\/feeds\/*", function (request, response) {
 	if (users[request.cookies.token]) {
 		var feed_url = decodeURIComponent(request.params[0]);
+		console.log("subscribing to " + feed_url + "...");
 
 		// Get feed OR (Add feed to database and get it)
 		var d = deferred();
 		db.getFeed({xmlUrl: feed_url})
 		.then(
 			function(feed) { // feed exists
+				console.log("... " + feed.title + " already exists");
 				d.resolve(feed);
 			},
 			function(err) {
 				if (err.message !== 'not_found') d.reject(err);
 
 				// Feed doesn't exist, we need to add it to the db
+				console.log("... " + feed_url + " doesn't exist yet");
 				feed.get_meta(feed_url)
 				.then(function (feed) {
+					console.log(feed);
+					console.log("... ... got " + feed.title + "; storing it...");
 					return db.addFeed(feed);
 				})
 				.then(function (f) {
+					console.log("... ... done");						
 					d.resolve(f);
 				})
-				.catch(function (err) { 
+				.catch(function (err) {
+					console.log("failed");
+					console.log(err);
 					d.reject(err)
 				});
 			}
@@ -272,6 +280,9 @@ function updateFeeds() {
 					});
 					return {newStories: _.pluck(newStories, 'guid'), feed: f.xmlUrl};
 				});
+			}, function (err) {
+				console.log("... unable to fetch " = f.title);
+				return [];
 			});
 		});
 	});
