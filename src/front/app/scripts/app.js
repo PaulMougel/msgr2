@@ -6,7 +6,7 @@ angular.module('msgr', ['xml', 'slugifier'])
     .when('/', {
         templateUrl: 'views/login.html',
     })
-    .when('/subscriptions/', {
+    .when('/subscriptions', {
         templateUrl: 'views/subscriptions.html',
     })
     .when('/feed/:feedSlug', {

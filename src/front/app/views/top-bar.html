@@ -1,0 +1,15 @@
+<div ng-controller="TopBarController">
+    <div class="row">
+        <div class="large-offset-1 large-10 columns">
+            <nav class="breadcrumbs">
+                <a
+                    ng-repeat="breadcrumb in breadcrumbs"
+                    href="{{ breadcrumb.link }}"
+                    class="{{ {true:'current', false:''}[$last] }}"
+                >
+                    {{ breadcrumb.title }}
+                </a>
+            </nav>
+        </div>
+    </div>
+</div>

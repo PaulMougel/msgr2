@@ -1,6 +1,8 @@
+<div ng-include src="'/views/top-bar.html'"></div>
+
 <div ng-controller="FeedController">
     <div class="row">
-        <div class="large-offset-1 large-10-columns">
+        <div class="large-offset-1 large-10 columns">
             <h1>
                 {{ subscription.title }}
                 <span class="pull-right label round">{{ subscription.unread.length }}</span>
@@ -9,7 +11,7 @@
     </div>
 
     <div class="row">
-        <div class="large-offset-1 large-10-columns">
+        <div class="large-offset-1 large-10 columns">
             <!-- List of feed articles -->
             <table class="feed-table-list">
                 <tbody>
