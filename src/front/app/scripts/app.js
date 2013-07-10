@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('msgr', ['xml', 'slugifier'])
-.config(['$routeProvider', function ($routeProvider) {
+.config(function ($routeProvider) {
     $routeProvider
     .when('/', {
         templateUrl: 'views/login.html',
@@ -21,7 +21,7 @@ angular.module('msgr', ['xml', 'slugifier'])
     .otherwise({
         templateUrl: 'views/404.html'
     });
-}])
+})
 .config(function ($httpProvider) {
     $httpProvider.responseInterceptors.push('xmlHttpInterceptor');
 })
