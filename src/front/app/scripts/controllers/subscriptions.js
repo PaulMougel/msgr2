@@ -10,7 +10,10 @@ angular.module('msgr')
 
     $scope.add = function() {
         subscriptionsService.add($scope.xmlUrl)
-        .success(refreshSubscriptions)
+        .success(function () {
+            $scope.xmlUrl = '';
+            refreshSubscriptions();
+        })
         .error(alert);
     };
 
