@@ -17,11 +17,14 @@ angular.module('msgr')
                 withCredentials: true
             });
         },
-        get: function(xmlUrl) {
+        get: function(xmlUrl, withoutcontent) {
             return $http({
                 method: 'GET',
                 url: apiBaseUrl + '/user/feeds/' + encodeURIComponent(xmlUrl),
-                withCredentials: true
+                withCredentials: true,
+                params: {
+                    withoutcontent: (withoutcontent === undefined) ? 'false' : withoutcontent.toString()
+                }
             });
         },
         delete: function(xmlUrl) {

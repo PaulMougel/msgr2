@@ -11,20 +11,21 @@
     <div class="row">
         <div class="large-offset-1 large-10-columns">
             <!-- List of feed articles -->
-            <div class="section-container accordion article-list" data-section="accordion">
-                <section ng-repeat="article in articles">
-                    <p class="title" data-section-title>
-                        <a href="#" ng-click="read(article)">
-                            <span ng-show="article.unread" class="pull-right label round">u</span>
-                            <span ng-hide="article.unread" class="pull-right label round success" ng-click="unread(article)">r</span>
-                            {{ article.title }}
-                        </a>
-                    </p>
-                    <div class="content" data-section-content>
-                        <div ng-bind-html-unsafe="article.description"></div>
-                    </div>
-                </section>
-            </div>
+            <table class="feed-table-list">
+                <tbody>
+                    <tr ng-repeat="article in articles">
+                        <td>
+                            <a href="#/feed/{{ subscription.title | slugify }}/{{ article.title | slugify }}" ng-click="read(article)">
+                                {{ article.title }}
+                            </a>
+                        </td>
+                        <td>
+                            <span ng-show="article.unread" class="label round" ng-click="read(article)">u</span>
+                            <span ng-hide="article.unread" class="label round success" ng-click="unread(article)">r</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

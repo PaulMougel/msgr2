@@ -239,6 +239,7 @@ Status: 200 OK
 
 * filter
 `all`, `unread`. Default: `all`.
+* `withoutcontent`: will send the articles information without their content. Default: `false`
 
 ##### Response
 

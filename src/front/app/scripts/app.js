@@ -9,8 +9,11 @@ angular.module('msgr', ['xml', 'slugifier'])
     .when('/subscriptions/', {
         templateUrl: 'views/subscriptions.html',
     })
-    .when('/feed/:titleSlug', {
+    .when('/feed/:feedSlug', {
         templateUrl: 'views/feed.html',
+    })
+    .when('/feed/:feedSlug/:articleSlug', {
+        templateUrl: 'views/article.html',
     })
     .when('/import-opml', {
         templateUrl: 'views/import-opml.html',

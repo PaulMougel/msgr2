@@ -21,15 +21,18 @@ angular.module('msgr')
     $scope.articles = undefined;
 
     authService.ensureLogin().success(function() {
-        // Find the feed corresponding to the URL parameter
+        // feedSlug => feed info
         _.map(authService.user.subscriptions, function(s) {
-            if (Slug.slugify(s.title) === $routeParams.titleSlug)
+            if (Slug.slugify(s.title) === $routeParams.feedSlug)
                 $scope.subscription = s;
         });
-        if ($scope.subscription === undefined)
+        if ($scope.subscription === undefined) {
             $location.path('/subscriptions');
+            return;
+        }
 
-        subscriptionsService.get($scope.subscription.xmlUrl).success(function(data) {
+        // Get all the articles information for this feed
+        subscriptionsService.get($scope.subscription.xmlUrl, true).success(function(data) {
             $scope.articles = data;
 
             _.map($scope.articles, function(article) {

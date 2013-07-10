@@ -101,6 +101,13 @@ app.get("/user/feeds", function (request, response) {
 
 /* get feed's last stories */
 app.get("\^\/user\/feeds\/*", function (request, response) {
+	var excludeContent = function (articles) {
+		_.each(articles, function(article) {
+			delete article.description;
+		});
+		return articles;
+	};
+
 	var feed_url = decodeURIComponent(request.params[0]);
 	if (users[request.cookies.token]) {
 		db.getAllArticlesForFeed({xmlUrl: feed_url})
@@ -114,10 +121,17 @@ app.get("\^\/user\/feeds\/*", function (request, response) {
 					dataToSend = _.filter(data, function (d) {
 						return unread.indexOf(d.guid) != -1;
 					});
+
+					if (request.query.withoutcontent === 'true')
+						excludeContent(dataToSend);
+
 					response.status(200).send(dataToSend);
 				});
 			}
 			else {
+				if (request.query.withoutcontent === 'true')
+					excludeContent(data);
+				
 				response.status(200).send(data);
 			}
 		}, function (error) {
