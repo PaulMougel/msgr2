@@ -3,3 +3,6 @@ dist
 .tmp
 .sass-cache
 app/components
+# The resource folder must be included in Git
+# but the Typicons are a dependency, thus managed by bower & grunt
+app/resources/typicons/

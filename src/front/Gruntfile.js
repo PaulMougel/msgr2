@@ -242,6 +242,32 @@ module.exports = function (grunt) {
       }
     },
     copy: {
+      typicons: {
+        files: [{
+          expand: true,
+          dot: true,
+          cwd: '<%= yeoman.app %>/components/typicons.font/font/',
+          dest: '<%= yeoman.app %>/resources/typicons/',
+          src: [
+            'typicons.svg',
+            'typicons.ttf',
+            'typicons.woff',
+            'typicons.eot'
+          ]
+        }]
+      },
+      cssAsScss: {
+        files: [
+          {
+            expand: true,
+            cwd: '<%= yeoman.app %>/components/',
+            src: ['**/*.min.css'],
+            dest: '<%= yeoman.app %>/components/',
+            filter: 'isFile',
+            ext: ".scss"
+          }
+        ]
+      },
       dist: {
         files: [{
           expand: true,
@@ -253,8 +279,19 @@ module.exports = function (grunt) {
             '.htaccess',
             // 'components/**/*',
             'images/{,*/}*.{gif,webp}',
-            'styles/fonts/*'
+            'styles/fonts/*',
+            'resources/**'
           ]
+        }]
+      }
+    },
+    replace: {
+      typicons: {
+        src: ['<%= yeoman.app %>/components/typicons.font/font/typicons.min.css'],
+        dest: '<%= yeoman.app %>/components/typicons.font/font/typicons.min.css',
+        replacements: [{ 
+          from: '/media/css/typicons/',                   // string replacement
+          to: '/resources/typicons/' 
         }]
       }
     }
@@ -265,6 +302,9 @@ module.exports = function (grunt) {
   grunt.registerTask('server', [
     'clean:server',
     'coffee:dist',
+    'replace',
+    'copy:cssAsScss',
+    'copy:typicons',
     'compass:server',
     'livereload-start',
     'connect:livereload',
@@ -285,13 +325,14 @@ module.exports = function (grunt) {
     //'jshint',
     //'test',
     'coffee',
+    'replace',
+    'copy',
     'compass:dist',
     'useminPrepare',
     'concat',
     'imagemin',
     'cssmin',
     'htmlmin',
-    'copy',
     // 'cdnify',
     'ngmin',
     'uglify',

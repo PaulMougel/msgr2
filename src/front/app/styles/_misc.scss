@@ -1,2 +1,19 @@
 .pull-left {float: left !important;}
 .pull-right {float: right !important;}
+
+// Typicons styling
+.typcn-big {
+    font-size: 1.5em;
+}
+
+.typcn-eye {
+    color: $success-color;
+}
+
+.typcn-eye-outline {
+    color: $primary-color;
+}
+
+.typcn-cancel {
+    color: $alert-color;
+}

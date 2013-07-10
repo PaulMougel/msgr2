@@ -12,7 +12,8 @@
     "angular-xml": "~0.1.1",
     "underscore": "~1.4.4",
     "pouchdb-nightly": "http://download.pouchdb.com/pouchdb-nightly.min.js",
-    "angular-slugify": "https://github.com/paulsmith/angular-slugify.git"
+    "angular-slugify": "https://github.com/paulsmith/angular-slugify.git",
+    "typicons.font": "https://github.com/stephenhutchings/typicons.font.git"
   },
   "devDependencies": {
     "angular-mocks": "~1.0.5",

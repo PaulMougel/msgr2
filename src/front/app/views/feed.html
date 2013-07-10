@@ -20,8 +20,8 @@
                             </a>
                         </td>
                         <td>
-                            <span ng-show="article.unread" class="label round" ng-click="read(article)">u</span>
-                            <span ng-hide="article.unread" class="label round success" ng-click="unread(article)">r</span>
+                            <span ng-show="article.unread" ng-click="read(article)"><i class="typcn typcn-big typcn-eye-outline"></i></span>
+                            <span ng-hide="article.unread" ng-click="unread(article)"><i class="typcn typcn-big typcn-eye"></i></span>
                         </td>
                     </tr>
                 </tbody>
