@@ -88,7 +88,7 @@ app.get("/user", function (request, response) {
 /* get feeds the logged user subscribed to */
 app.get("/user/feeds", function (request, response) {
 	if (users[request.cookies.token]) {
-		db.getUser({login: users[request.cookies.token]})
+		db.getUserWithFeedSummary({login: users[request.cookies.token]})
 		.then(function (user) {
 			response.status(200).send(user.subscriptions);
 		}, function (error) {

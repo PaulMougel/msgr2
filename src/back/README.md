@@ -47,6 +47,7 @@ Available functions:
 - `signup({login, password})`, where the password is plaintext (will be hashed by the function). Resolves to a user object.
 - `signin({login, password})`, where the password is plaintext (will be hashed by the function). Resolves to a user object.
 - `getUser({login})`. Resolves to a user object.
+- `getUserWithFeedSummary({login})`. Resolves to a user object, augmented with the unread article count for each feed.
 - `getAllUsers({login})`. Resolves to a list of user objects.
 - `subscribe({login}, {title, xmlUrl})` will add a subscription for a user
 - `unsubscribe({login}, {xmlUrl})` will remove a subscription for a user

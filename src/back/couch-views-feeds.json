@@ -6,6 +6,10 @@
         },
         "subscribersByFeed": {
             "map": "function(doc) { if (doc.type === 'user') { var i; for (i=0;i<doc.subscriptions.length;i++) emit(doc.subscriptions[i].xmlUrl, doc) } }"
+        },
+        "unreadCount": {
+            "map": "function(doc) { if (doc.type === 'readstate') emit([doc.user, doc.feed], doc.article); }",
+            "reduce": "function(keys, values, rereduce) {if (rereduce) {return sum(values);} else {return values.length;}}"
         }
     }
 }

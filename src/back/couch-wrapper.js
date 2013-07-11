@@ -197,6 +197,27 @@ function getAllFeeds() {
     });
 }
 
+function getUserWithFeedSummary(user) {
+    return getUser(user)
+    .then(function(u) {
+        // Group by user login and feed xmlUrl: group_level=2
+        // Only get the data related to a user: startkey=["toto"]&endkey=["toto",{}]
+        return doGET(DBNAME + '/_design/feeds/_view/unreadCount'
+                    + '?group_level=2'
+                    + '&startkey=["' + u.login + '"]'
+                    + '&endkey=["' + u.login + '",{}]')
+        .then(function (d) {
+            _.map(d.rows, function (result) {
+                var feed = result.key[1];
+                var count = result.value;
+                _.findWhere(u.subscriptions, {xmlUrl: feed}).unreadCount = count;
+            });
+
+            return u;
+        });
+    })
+}
+
 function addArticle(article) {
     article.type = 'article';
     return doPUT(DBNAME + '/' + encodeURIComponent(article.guid), article)
@@ -253,6 +274,7 @@ exports.updateUser = updateUser;
 exports.addFeed = addFeed;
 exports.getFeed = getFeed;
 exports.getAllFeeds = getAllFeeds;
+exports.getUserWithFeedSummary = getUserWithFeedSummary;
 exports.addArticle = addArticle;
 exports.getArticle = getArticle;
 exports.getAllArticlesForFeed = getAllArticlesForFeed;
