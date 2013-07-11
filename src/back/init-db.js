@@ -113,7 +113,6 @@ function createView(couchUrl, filename) {
 
 function initDb() {
     return createDb()
-    .then(function() { createView('/_design/articles', './couch-views-articles');} )
     .then(function() { createView('/_design/feeds', './couch-views-feeds');} )
     .then(function() { createView('/_design/users', './couch-views-users');} )
 }

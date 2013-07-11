@@ -33,14 +33,27 @@ User format:
 }
 ```
 
+Readstate format:
+```json
+{
+    "login": "foo", // user login
+    "feed": "bar", // feed xmlUrl
+    "article": { "guid", "pubdate", "title" },
+    "read": true // has the user read this article or not?
+}
+```
+
 Available functions:
 - `signup({login, password})`, where the password is plaintext (will be hashed by the function). Resolves to a user object.
 - `signin({login, password})`, where the password is plaintext (will be hashed by the function). Resolves to a user object.
 - `getUser({login})`. Resolves to a user object.
+- `getUserWithFeedSummary({login})`. Resolves to a user object, augmented with the unread article count for each feed.
 - `getAllUsers({login})`. Resolves to a list of user objects.
 - `subscribe({login}, {title, xmlUrl})` will add a subscription for a user
 - `unsubscribe({login}, {xmlUrl})` will remove a subscription for a user
 - `updateUser({…})` will update the user in the database and resolve to the updated user
+- `addReadstate({login}, {xmlUrl}, {guid, pubdate, title}, true/false)`, will add a readstate document that stores the state of an article (read/unread) for one user. For map/reduce convenience we also need to store the feed url, the article publication date and title.
+- `updateReadstate({login}, {guid}, true/false)`, will update the readstate document (only the read property will be updated)
 
 ### Feed management
 
@@ -77,7 +90,7 @@ Article format:
 Available functions:
 - `addArticle({title, description, link, pubdate, guid})`
 - `getArticle({guid})`, will resolve to the corresponding article
-- `getAllArticlesForFeed({xmlUrl})`, resolves to all the articles of a feed
+- `getAllArticlesForFeed({login}, {xmlUrl})`, resolves to all the articles of a feed, including readstates related to the user.
 
 ## REST API
 
@@ -224,7 +237,8 @@ Status: 20O OK
 [
   {
     "title": "LinuxFr.org : les journaux",
-    "xmlUrl": "http://linuxfr.org/journaux.atom"
+    "xmlUrl": "http://linuxfr.org/journaux.atom",
+    "unreadCount": 20
   }
 ]
 ```
@@ -239,7 +253,27 @@ Status: 200 OK
 
 * filter
 `all`, `unread`. Default: `all`.
-* `withoutcontent`: will send the articles information without their content. Default: `false`
+
+##### Response
+
+Warning: this query returns a list of simplified article objects (without their content)
+
+```json
+[
+        {
+        "title": "Test de la Manjaro Linux",
+        "read": true,
+        "pubdate": "2013-06-26T13:48:58.000Z",
+        "guid": "tag:linuxfr.org,2005:Diary/34047"
+    }
+]
+```
+
+Status: 200 OK
+
+#### Get a particular article
+
+    GET /user/articles/:guid
 
 ##### Response
 
@@ -247,10 +281,10 @@ Status: 200 OK
 [
         {
         "title": "Test de la Manjaro Linux",
-        "description": "*some html document*",
-        "link": "http://linuxfr.org/users/eqfm/journaux/test-de-la-manjaro-linux",
         "pubdate": "2013-06-26T13:48:58.000Z",
-        "guid": "tag:linuxfr.org,2005:Diary/34047"
+        "guid": "tag:linuxfr.org,2005:Diary/34047",
+        "description": "some html",
+        "link": "http://linuxfr.org/users/eqfm/journaux/test-de-la-manjaro-linux"
     }
 ]
 ```

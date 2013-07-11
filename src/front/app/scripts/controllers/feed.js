@@ -4,15 +4,13 @@ angular.module('msgr')
 .controller('FeedController', function ($scope, $routeParams, $location, authService, subscriptionsService, Slug) {
     $scope.read = function(article) {
         subscriptionsService.read($scope.subscription.xmlUrl, article.guid).success(function() {
-            article.unread = false;
-            $scope.subscription.unread = _.without($scope.subscription.unread, article.guid);
+            article.read = true;
         });
     };
 
      $scope.unread = function(article) {
         subscriptionsService.unread($scope.subscription.xmlUrl, article.guid).success(function() {
-            article.unread = true;
-            $scope.subscription.unread.push(article.guid);
+            article.read = false;
         });
     };
 
@@ -32,12 +30,18 @@ angular.module('msgr')
         }
 
         // Get all the articles information for this feed
-        subscriptionsService.get($scope.subscription.xmlUrl, true).success(function(data) {
+        subscriptionsService.get($scope.subscription.xmlUrl).success(function (data) {
             $scope.articles = data;
-
-            _.map($scope.articles, function(article) {
-                article.unread = _.contains($scope.subscription.unread, article.guid);
-            })
         });
     });
+
+    $scope.$watch(
+        'articles',
+        function() {
+            $scope.unreadCount = _.filter($scope.articles, function (article) {
+                return ! article.read;
+            }).length;
+        },
+        true
+    );
 });
