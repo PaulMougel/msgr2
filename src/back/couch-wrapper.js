@@ -88,6 +88,13 @@ function cleanArticle(article) {
     return article;
 }
 
+function cleanReadstate(readstate) {
+    delete readstate._id;
+    delete readstate._rev;
+    delete readstate.type;
+    return readstate;
+}
+
 // Public API
 function signup(user) {
     user.type = 'user';
@@ -233,11 +240,15 @@ function getArticle(article) {
     });
 }
 
-function getAllArticlesForFeed(feed) {
-    return doGET(DBNAME + '/_design/articles/_view/byFeed?key="' + encodeURIComponent(feed.xmlUrl) + '"')
+function getAllArticlesForFeed(user, feed) {
+    return doGET(DBNAME + '/_design/feeds/_view/readState'
+                    + '?startkey=["' + user.login + '","' + encodeURIComponent(feed.xmlUrl) + '"]'
+                    + '&endkey=["' + user.login + '","' + encodeURIComponent(feed.xmlUrl) + '"]')
     .then(function(data) {
-        return _.map(data.rows, function (row) {
-            return cleanArticle(row.value);
+        return _.map(data.rows, function (d) {
+            var readstate = d.value;
+            readstate.article.read = readstate.read; // inject read boolean into article object
+            return readstate.article; // and return to server only the article objects
         });
     });
 }
@@ -256,12 +267,20 @@ function addReadstate(user, subscription, article, read) {
         DBNAME + '/' + user.login + ':' + encodeURIComponent(article.guid),
         {
             type: 'readstate',
-            user: user.login,
+            login: user.login,
             feed: subscription.xmlUrl,
-            article: article.guid,
+            article: { guid: article.guid, pubdate: article.pubdate, title: article.title },
             read: read
         }
     );
+}
+
+function updateReadstate(user, article, read) {
+    return doGET(DBNAME + '/' + user.login + ':' + encodeURIComponent(article.guid))
+    .then(function (readstate) {
+        readstate.read = read;
+        return doPUT(DBNAME + '/' + user.login + ':' + encodeURIComponent(article.guid), readstate);
+    });
 }
 
 exports.signup = signup;
@@ -280,3 +299,4 @@ exports.getArticle = getArticle;
 exports.getAllArticlesForFeed = getAllArticlesForFeed;
 exports.getSubscribersForFeed = getSubscribersForFeed;
 exports.addReadstate = addReadstate;
+exports.updateReadstate = updateReadstate;

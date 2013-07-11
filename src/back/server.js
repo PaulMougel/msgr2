@@ -71,7 +71,7 @@ app.post("/users/signup", function (request, response) {
 	}
 });
 
-/* get user info, including unread count */
+/* get user info */
 app.get("/user", function (request, response) {
 	if (users[request.cookies.token]) {
 		db.getUser({login: users[request.cookies.token]})
@@ -101,39 +101,31 @@ app.get("/user/feeds", function (request, response) {
 
 /* get feed's last stories */
 app.get("\^\/user\/feeds\/*", function (request, response) {
-	var excludeContent = function (articles) {
-		_.each(articles, function(article) {
-			delete article.description;
-		});
-		return articles;
-	};
-
 	var feed_url = decodeURIComponent(request.params[0]);
 	if (users[request.cookies.token]) {
-		db.getAllArticlesForFeed({xmlUrl: feed_url})
+		db.getAllArticlesForFeed({login: users[request.cookies.token]}, {xmlUrl: feed_url})
 		.then(function (data) {
 			if (request.query.filter === "unread") {
-				db.getUser({login: users[request.cookies.token]})
-				.then(function (user) {
-					var unread = _.find(user.subscriptions, function (s) {
-						return (s.xmlUrl === feed_url)
-					}).unread, dataToSend = [];
-					dataToSend = _.filter(data, function (d) {
-						return unread.indexOf(d.guid) != -1;
-					});
-
-					if (request.query.withoutcontent === 'true')
-						excludeContent(dataToSend);
-
-					response.status(200).send(dataToSend);
-				});
+				data = _.filter(data, function (article) { return ! article.read; });
 			}
-			else {
-				if (request.query.withoutcontent === 'true')
-					excludeContent(data);
-				
-				response.status(200).send(data);
-			}
+
+			response.status(200).send(data);
+		}, function (error) {
+			response.status(403).send(error.message);
+		});
+	} else {
+		response.send(401);
+	}
+});
+
+/* get an article */
+app.get("\^\/user\/articles\/*", function (request, response) {
+	var guid = decodeURIComponent(request.params[0]);
+	
+	if (users[request.cookies.token]) {
+		db.getArticle({guid: guid})
+		.then(function (data) {
+			response.status(200).send(data);
 		}, function (error) {
 			response.status(403).send(error.message);
 		});
@@ -146,18 +138,7 @@ app.get("\^\/user\/feeds\/*", function (request, response) {
 app.post("\^\/user\/feeds\/*\/*\/read", function (request, response) {
 	var feed_url = decodeURIComponent(request.params[0]), story_guid = decodeURIComponent(request.params[1]);
 	if (users[request.cookies.token]) {
-		db.getUser({login: users[request.cookies.token]})
-		.then(function (user) {
-			var unread = _.find(user.subscriptions, function (s) {
-				return (s.xmlUrl === feed_url)
-			}).unread;
-			unread = _.without(unread, story_guid);
-			user.subscriptions[_.indexOf(user.subscriptions, _.findWhere(user.subscriptions, {xmlUrl: feed_url}))].unread = unread;
-			return db.updateUser(user)
-			.then(function () {
-				return user;
-			});
-		})
+		db.updateReadstate({login: users[request.cookies.token]}, {guid: story_guid}, true)
 		.then(
 			function (user) {
 				response.status(200).send(user);
@@ -174,16 +155,7 @@ app.post("\^\/user\/feeds\/*\/*\/read", function (request, response) {
 app.post("\^\/user\/feeds\/*\/*\/unread", function (request, response) {
 	var feed_url = decodeURIComponent(request.params[0]), story_guid = decodeURIComponent(request.params[1]);
 	if (users[request.cookies.token]) {
-		db.getUser({login: users[request.cookies.token]})
-		.then(function (user) {
-			var unread = _.find(user.subscriptions, function (s) {
-				return (s.xmlUrl === feed_url)
-			}).unread, story_array = [];
-			story_array.push(story_guid);
-			unread = _.union(unread, story_array);
-			user.subscriptions[_.indexOf(user.subscriptions, _.findWhere(user.subscriptions, {xmlUrl: feed_url}))].unread = unread;
-			return db.updateUser(user);
-		})
+		db.updateReadstate({login: users[request.cookies.token]}, {guid: story_guid}, false)
 		.then(
 			function (user) {
 				response.status(200).send(user);

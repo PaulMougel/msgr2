@@ -16,16 +16,23 @@ angular.module('msgr')
         if (subscription === undefined)
             $location.path('/subscriptions');
 
-        // articleSlug => article infos
+        // get all articles basic information for this feed
         subscriptionsService.get(subscription.xmlUrl)
         .success(function(s) {
-            $scope.article = undefined;
+            // article slug => article guid
+            var article_guid = undefined;
             _.map(s, function(a) {
                 if (Slug.slugify(a.title) === $routeParams.articleSlug)
-                    $scope.article = a;
+                    article_guid = a.guid;
             });
-            if ($scope.article === undefined)
+            if (article_guid === undefined) {
                 $location.path('/feed/' + feedSlug);
+                return;
+            }
+
+            subscriptionsService.getArticle(article_guid).success(function (data) {
+                $scope.article = data;
+            })
         })
         .error(function() {
             $location.path('/feed/' + feedSlug);
