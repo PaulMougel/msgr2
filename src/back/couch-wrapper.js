@@ -138,7 +138,6 @@ function getAllUsers() {
 function subscribe(user, feed) {
     return doGET(DBNAME + '/' + user.login)
     .then(function (user) {
-        feed.unread = [];
         user.subscriptions.push(feed);
         return doPUT(DBNAME + '/' + user.login, user)
         .then(function () {
@@ -231,6 +230,19 @@ function getSubscribersForFeed(feed) {
     })
 }
 
+function addReadstate(user, subscription, article, read) {
+    return doPUT(
+        DBNAME + '/' + user.login + ':' + encodeURIComponent(article.guid),
+        {
+            type: 'readstate',
+            user: user.login,
+            feed: subscription.xmlUrl,
+            article: article.guid,
+            read: read
+        }
+    );
+}
+
 exports.signup = signup;
 exports.signin = signin;
 exports.getUser = getUser;
@@ -245,3 +257,4 @@ exports.addArticle = addArticle;
 exports.getArticle = getArticle;
 exports.getAllArticlesForFeed = getAllArticlesForFeed;
 exports.getSubscribersForFeed = getSubscribersForFeed;
+exports.addReadstate = addReadstate;

@@ -33,6 +33,16 @@ User format:
 }
 ```
 
+Readstate format:
+```json
+{
+    "user": "foo", // user login
+    "feed": "bar", // feed xmlUrl
+    "article": "baz", // article GUID
+    "read": true // has the user read this article or not?
+}
+```
+
 Available functions:
 - `signup({login, password})`, where the password is plaintext (will be hashed by the function). Resolves to a user object.
 - `signin({login, password})`, where the password is plaintext (will be hashed by the function). Resolves to a user object.
@@ -41,6 +51,7 @@ Available functions:
 - `subscribe({login}, {title, xmlUrl})` will add a subscription for a user
 - `unsubscribe({login}, {xmlUrl})` will remove a subscription for a user
 - `updateUser({…})` will update the user in the database and resolve to the updated user
+- `addReadstate({login}, {xmlUrl}, {guid}, true/false)`, will add a readstate document that stores the state of an article (read/unread) for one user. For map/reduce convenience we also need to store the feed url.
 
 ### Feed management
 

@@ -292,7 +292,7 @@ function updateFeeds() {
 					var newStories = _.filter(stories, function (story) {
 						return story !== undefined;
 					});
-					return {newStories: _.pluck(newStories, 'guid'), feed: f.xmlUrl};
+					return {newStories: newStories, feed: f.xmlUrl};
 				});
 			}, function (err) {
 				console.log("... unable to fetch " = f.title);
@@ -304,20 +304,20 @@ function updateFeeds() {
 	// Retrieve all users
 	var allUsers = db.getAllUsers();
 
-	// When we have both, add all new stories to the unread list of a user,
-	// then update him (user object is then updated only once per API call)
+	// When we have both, add all readState documents
 	return deferred(newStoriesByFeed, allUsers)
 	.then(function (data) {
-		console.log("... done")
+		console.log("... got all feeds & users information, adding readState documents");
 		var newStoriesByFeed = data[0];
 		var allUsers = data[1];
 
 		return deferred.map(allUsers, function (user) {
-			_.map(user.subscriptions, function (subscription) {
-				var unreadGuid = _.findWhere(newStoriesByFeed, {feed: subscription.xmlUrl}).newStories;
-				subscription.unread = _.union(subscription.unread, unreadGuid);
+			return deferred.map(user.subscriptions, function (subscription) {
+				var newArticles = _.findWhere(newStoriesByFeed, {feed: subscription.xmlUrl}).newStories;
+				return deferred.map(newArticles, function (newArticle) {
+					return db.addReadstate(user, subscription, newArticle, false);
+				});
 			});
-			return db.updateUser(user);
 		});
 	});
 }
