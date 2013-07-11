@@ -62,6 +62,33 @@ function doPUT(url, data) {
     return d.promise;
 }
 
+function doDELETE(url) {
+    var d = deferred();
+    var req = http.request(
+        { host: HOST, port: PORT, method: 'DELETE', path: url},
+        function(res) {
+            var data = '';
+            res.on('data', function(chunk) { data += chunk; });
+            res.on('end', function() {
+                var result = JSON.parse(data);
+
+                if (res.statusCode >= 400) {
+                    var error = new Error(result.error);
+                    d.reject(error);
+                } else {
+                    d.resolve(result);
+                }
+            });
+        }
+    );
+    req.on('error', function(e) {
+        d.reject(e);
+    });
+    req.end();
+
+    return d.promise;
+}
+
 function hash(text) {
     return crypto.createHash("sha512").update(text, "utf8").digest("hex");
 }
@@ -154,7 +181,8 @@ function subscribe(user, feed) {
 }
 
 function unsubscribe(user, feed) {
-    return doGET(DBNAME + '/' + user.login)
+    // 1) update the user object
+    var updatedUser = doGET(DBNAME + '/' + user.login)
     .then(function (user) {
         user.subscriptions = _.filter(user.subscriptions, function(subscription) {
             return subscription.xmlUrl !== feed.xmlUrl;
@@ -164,6 +192,23 @@ function unsubscribe(user, feed) {
             return cleanUser(user);
         });
     });
+    // 2) remove the readState objects
+    var deleteReadStates = doGET(DBNAME + '/_design/feeds/_view/readState'
+                + '?startkey=["' + user.login + '","' + encodeURIComponent(feed.xmlUrl) + '"]'
+                + '&endkey=["' + user.login + '","' + encodeURIComponent(feed.xmlUrl) + '"]')
+    .then(function (data) {
+        var readstates = data.rows;
+        // NOTE: We limit the number of concurrent DELETE request to 5 with
+        // deferred.gate. CouchDB seems to fail when too many DELETE requests
+        // are issued at the same time
+        return deferred.map(readstates, deferred.gate(function (row) {
+            return doDELETE(DBNAME + '/' + encodeURIComponent(row.value._id) + '?rev=' + row.value._rev);
+        }), 5);
+    });
+
+    return deferred(updatedUser, deleteReadStates).then(function (data) {
+        return data[0]; // updated user
+    })
 }
 
 function updateUser(user) {
