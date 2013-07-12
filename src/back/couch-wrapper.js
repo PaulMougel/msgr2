@@ -62,10 +62,10 @@ function doPUT(url, data) {
     return d.promise;
 }
 
-function doDELETE(url) {
+function doPOST(url, data) {
     var d = deferred();
     var req = http.request(
-        { host: HOST, port: PORT, method: 'DELETE', path: url},
+        { host: HOST, port: PORT, method: 'POST', path: url, headers:{'Content-Type': 'application/json'} },
         function(res) {
             var data = '';
             res.on('data', function(chunk) { data += chunk; });
@@ -84,6 +84,7 @@ function doDELETE(url) {
     req.on('error', function(e) {
         d.reject(e);
     });
+    req.write(JSON.stringify(data));
     req.end();
 
     return d.promise;
@@ -192,18 +193,16 @@ function unsubscribe(user, feed) {
             return cleanUser(user);
         });
     });
-    // 2) remove the readState objects
+    // 2) Bulk remove the readState objects
     var deleteReadStates = doGET(DBNAME + '/_design/feeds/_view/readState'
                 + '?startkey=["' + user.login + '","' + encodeURIComponent(feed.xmlUrl) + '"]'
                 + '&endkey=["' + user.login + '","' + encodeURIComponent(feed.xmlUrl) + '"]')
     .then(function (data) {
-        var readstates = data.rows;
-        // NOTE: We limit the number of concurrent DELETE request to 5 with
-        // deferred.gate. CouchDB seems to fail when too many DELETE requests
-        // are issued at the same time
-        return deferred.map(readstates, deferred.gate(function (row) {
-            return doDELETE(DBNAME + '/' + encodeURIComponent(row.value._id) + '?rev=' + row.value._rev);
-        }), 5);
+        var readstates = _.pluck(data.rows, 'value');
+        _.map(readstates, function (readstate) {
+            readstate._deleted = true;
+        });
+        return doPOST(DBNAME + '/_bulk_docs', {docs: readstates});
     });
 
     return deferred(updatedUser, deleteReadStates).then(function (data) {
