@@ -8,6 +8,17 @@ angular.module('msgr')
         });
     };
 
+    $scope.markAllAsRead = function (subscription) {
+        subscriptionsService.get(subscription.xmlUrl)
+            .then(function (res) {
+                res.data.forEach(function (story) {
+                    subscriptionsService.read(subscription.xmlUrl, story.guid);
+                    subscription.unreadCount -= 1;
+                })
+            })
+
+    }
+
     $scope.add = function() {
         subscriptionsService.add($scope.xmlUrl)
         .success(function () {

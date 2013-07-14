@@ -21,6 +21,12 @@
                             <td>
                                 <span class="label round">{{ subscription.unreadCount }}</span>
                             </td>
+                            <td ng-show="subscription.unreadCount">
+                                <a href="" ng-click="markAllAsRead(subscription)"><i class="typcn typcn-big typcn-tick-outline"></i></a>
+                            </td>
+                            <td ng-hide="subscription.unreadCount">
+                                <i class="typcn typcn-big typcn-tick"></i>
+                            </td>
                             <td>
                                 <a href="" ng-click="delete(subscription)"><i class="typcn typcn-big typcn-cancel"></i></a>
                             </td>
