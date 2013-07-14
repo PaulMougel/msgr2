@@ -263,6 +263,7 @@ function getUserWithFeedSummary(user) {
                 var count = result.value;
                 _.findWhere(u.subscriptions, {xmlUrl: feed}).unreadCount = count;
             });
+            _.findWhere(u.subscriptions, {unreadCount: undefined}).unreadCount = 0;
 
             return u;
         });
