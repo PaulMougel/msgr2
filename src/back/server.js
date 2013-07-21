@@ -8,10 +8,19 @@ var _ = require("underscore");
 
 var app = express();
 var users = [];
-users.token = "kikoo";
 
+//users.token = "kikoo";
+
+/* middlewares */
 app.use(express.cookieParser());
 app.use(express.bodyParser());
+var auth = function(request, response, next) {
+	if (users[request.cookies.token]) {
+		next();
+	} else {
+		return response.send(401);
+	}
+}
 
 /* implement CORS */
 app.all("*", function (request, response, next) {
@@ -72,172 +81,139 @@ app.post("/users/signup", function (request, response) {
 });
 
 /* get user info */
-app.get("/user", function (request, response) {
-	if (users[request.cookies.token]) {
-		db.getUser({login: users[request.cookies.token]})
-		.then(function (user) {
-			response.status(200).send(user);
-		}, function (error) {
-			response.status(403).send(error.message);
-		});
-	} else {
-		response.send(401);
-	}
+app.get("/user", auth, function (request, response) {
+	db.getUser({login: users[request.cookies.token]})
+	.then(function (user) {
+		response.status(200).send(user);
+	}, function (error) {
+		response.status(403).send(error.message);
+	});
 });
 
 /* get feeds the logged user subscribed to */
-app.get("/user/feeds", function (request, response) {
-	if (users[request.cookies.token]) {
-		db.getUserWithFeedSummary({login: users[request.cookies.token]})
-		.then(function (user) {
-			response.status(200).send(user.subscriptions);
-		}, function (error) {
-			response.status(403).send(error.message);
-		});
-	} else {
-		response.send(401);
-	}
+app.get("/user/feeds", auth, function (request, response) {
+	db.getUserWithFeedSummary({login: users[request.cookies.token]})
+	.then(function (user) {
+		response.status(200).send(user.subscriptions);
+	}, function (error) {
+		response.status(403).send(error.message);
+	});
 });
 
 /* get feed's last stories */
-app.get("\^\/user\/feeds\/*", function (request, response) {
+app.get("\^\/user\/feeds\/*", auth, function (request, response) {
 	var feed_url = decodeURIComponent(request.params[0]);
-	if (users[request.cookies.token]) {
-		db.getAllArticlesForFeed({login: users[request.cookies.token]}, {xmlUrl: feed_url})
-		.then(function (data) {
-			if (request.query.filter === "unread") {
-				data = _.filter(data, function (article) { return ! article.read; });
-			}
+	db.getAllArticlesForFeed({login: users[request.cookies.token]}, {xmlUrl: feed_url})
+	.then(function (data) {
+		if (request.query.filter === "unread") {
+			data = _.filter(data, function (article) { return ! article.read; });
+		}
 
-			response.status(200).send(data);
-		}, function (error) {
-			response.status(403).send(error.message);
-		});
-	} else {
-		response.send(401);
-	}
+		response.status(200).send(data);
+	}, function (error) {
+		response.status(403).send(error.message);
+	});
 });
 
 /* get an article */
-app.get("\^\/user\/articles\/*", function (request, response) {
+app.get("\^\/user\/articles\/*", auth, function (request, response) {
 	var guid = decodeURIComponent(request.params[0]);
-	
-	if (users[request.cookies.token]) {
-		db.getArticle({guid: guid})
-		.then(function (data) {
-			response.status(200).send(data);
-		}, function (error) {
-			response.status(403).send(error.message);
-		});
-	} else {
-		response.send(401);
-	}
+	db.getArticle({guid: guid})
+	.then(function (data) {
+		response.status(200).send(data);
+	}, function (error) {
+		response.status(403).send(error.message);
+	});
 });
 
 /* mark an article as read */
-app.post("\^\/user\/feeds\/*\/*\/read", function (request, response) {
+app.post("\^\/user\/feeds\/*\/*\/read", auth, function (request, response) {
 	var feed_url = decodeURIComponent(request.params[0]), story_guid = decodeURIComponent(request.params[1]);
-	if (users[request.cookies.token]) {
-		db.updateReadstate({login: users[request.cookies.token]}, {guid: story_guid}, true)
-		.then(
-			function (user) {
-				response.status(200).send(user);
-			}, function (error) {
-				response.status(403).send(error.message);
-			}
-		);
-	} else {
-		response.send(401);
-	}
+	db.updateReadstate({login: users[request.cookies.token]}, {guid: story_guid}, true)
+	.then(
+		function (user) {
+			response.status(200).send(user);
+		}, function (error) {
+			response.status(403).send(error.message);
+		}
+	);
 });
 
 /* mark an article as unread */
-app.post("\^\/user\/feeds\/*\/*\/unread", function (request, response) {
+app.post("\^\/user\/feeds\/*\/*\/unread", auth, function (request, response) {
 	var feed_url = decodeURIComponent(request.params[0]), story_guid = decodeURIComponent(request.params[1]);
-	if (users[request.cookies.token]) {
-		db.updateReadstate({login: users[request.cookies.token]}, {guid: story_guid}, false)
-		.then(
-			function (user) {
-				response.status(200).send(user);
-			}, function (error) {
-				response.status(403).send(error.message);
-			}
-		);
-	} else {
-		response.send(401);
-	}
+	db.updateReadstate({login: users[request.cookies.token]}, {guid: story_guid}, false)
+	.then(
+		function (user) {
+			response.status(200).send(user);
+		}, function (error) {
+			response.status(403).send(error.message);
+		}
+	);
 });
 
 /* subscribe to a feed */
-app.put("\^\/user\/feeds\/*", function (request, response) {
-	if (users[request.cookies.token]) {
-		var feed_url = decodeURIComponent(request.params[0]);
-		console.log("subscribing to " + feed_url + "...");
-
-		// Get feed OR (Add feed to database and get it)
-		var d = deferred();
-		db.getFeed({xmlUrl: feed_url})
-		.then(
-			function(feed) { // feed exists
-				console.log("... " + feed.title + " already exists");
-				d.resolve(feed);
-			},
-			function(err) {
-				if (err.message !== 'not_found') d.reject(err);
-
-				// Feed doesn't exist, we need to add it to the db
-				console.log("... " + feed_url + " doesn't exist yet");
-				feed.get_meta(feed_url)
-				.then(function (feed) {
-					console.log(feed);
-					console.log("... ... got " + feed.title + "; storing it...");
-					return db.addFeed(feed);
-				})
-				.then(function (f) {
-					console.log("... ... done");						
-					d.resolve(f);
-				})
-				.catch(function (err) {
-					console.log("failed");
-					console.log(err);
-					d.reject(err)
-				});
-			}
-		);
-		// Make the user subscribe to this feed
-		d.promise.then(
-			function (feed) {
-				db.subscribe({login: users[request.cookies.token]}, {title: feed.title, xmlUrl: feed.xmlUrl})
-				.then(function (user) {
-					response.status(200).send(user);
-				}, function (error) {
-					response.status(403).send(error.message);
-				});
-			}
-			, function (error) {
-				response.status(403).send(error.message);
-			}
-		);
-	} else {
-		response.send(401);
-	}
-});
-
-/* cancel a subscription */
-app.delete("\^\/user\/feeds\/*", function (request, response) {
+app.put("\^\/user\/feeds\/*", auth, function (request, response) {
 	var feed_url = decodeURIComponent(request.params[0]);
-	if (users[request.cookies.token]) {
-		db.unsubscribe({login: users[request.cookies.token]}, {xmlUrl: feed_url})
-		.then(
-			function (user) {
+	console.log("subscribing to " + feed_url + "...");
+
+	// Get feed OR (Add feed to database and get it)
+	var d = deferred();
+	db.getFeed({xmlUrl: feed_url})
+	.then(
+		function(feed) { // feed exists
+			console.log("... " + feed.title + " already exists");
+			d.resolve(feed);
+		},
+		function(err) {
+			if (err.message !== 'not_found') d.reject(err);
+
+			// Feed doesn't exist, we need to add it to the db
+			console.log("... " + feed_url + " doesn't exist yet");
+			feed.get_meta(feed_url)
+			.then(function (feed) {
+				console.log(feed);
+				console.log("... ... got " + feed.title + "; storing it...");
+				return db.addFeed(feed);
+			})
+			.then(function (f) {
+				console.log("... ... done");						
+				d.resolve(f);
+			})
+			.catch(function (err) {
+				console.log("failed");
+				console.log(err);
+				d.reject(err)
+			});
+		}
+	);
+	// Make the user subscribe to this feed
+	d.promise.then(
+		function (feed) {
+			db.subscribe({login: users[request.cookies.token]}, {title: feed.title, xmlUrl: feed.xmlUrl})
+			.then(function (user) {
 				response.status(200).send(user);
 			}, function (error) {
 				response.status(403).send(error.message);
-			}
-		);
-	} else {
-		response.send(401);
-	}
+			});
+		}
+		, function (error) {
+			response.status(403).send(error.message);
+		}
+	);
+});
+
+/* cancel a subscription */
+app.delete("\^\/user\/feeds\/*", auth, function (request, response) {
+	var feed_url = decodeURIComponent(request.params[0]);
+	db.unsubscribe({login: users[request.cookies.token]}, {xmlUrl: feed_url})
+	.then(
+		function (user) {
+			response.status(200).send(user);
+		}, function (error) {
+			response.status(403).send(error.message);
+		}
+	);
 });
 
 /* 
@@ -295,17 +271,13 @@ function updateFeeds() {
 }
 
 /* we should not provide this API call in a production environment */
-app.post("/feeds/update", function (request, response) {
-	if (users[request.cookies.token]) {
-		updateFeeds()
-		.then(
-			function () {console.log('Feed update: Success')},
-			function (err) {console.log('Feed update: Error, ' + err.message)}
-		);
-		response.send(204);
-	} else {
-		response.send(401);
-	}
+app.post("/feeds/update", auth, function (request, response) {
+	updateFeeds()
+	.then(
+		function () {console.log('Feed update: Success')},
+		function (err) {console.log('Feed update: Error, ' + err.message)}
+	);
+	response.send(204);
 });
 
 app.listen(3000);
