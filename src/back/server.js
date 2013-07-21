@@ -9,15 +9,28 @@ var _ = require("underscore");
 var app = express();
 var users = [];
 
-//users.token = "kikoo";
-
 /* middlewares */
 app.use(express.cookieParser());
 app.use(express.bodyParser());
 var auth = function(request, response, next) {
-	if (users[request.cookies.token]) {
+	if (request.cookies.token && users[request.cookies.token]) {
+		request.login = users[request.cookies.token];
 		next();
-	} else {
+	}
+	else if (request.get("Authorization")) {
+		express.basicAuth(function (login, password, callback) {
+			db.signin({
+				login: login,
+				password: password
+			}).then(function (user) {
+				request.login = user.login;
+				callback(null, true);
+			}, function (error) {
+				callback(error.message, false);
+			});
+		})(request, response, next);
+	}
+	else {
 		return response.send(401);
 	}
 }
@@ -82,7 +95,7 @@ app.post("/users/signup", function (request, response) {
 
 /* get user info */
 app.get("/user", auth, function (request, response) {
-	db.getUser({login: users[request.cookies.token]})
+	db.getUser({login: request.login})
 	.then(function (user) {
 		response.status(200).send(user);
 	}, function (error) {
@@ -92,7 +105,7 @@ app.get("/user", auth, function (request, response) {
 
 /* get feeds the logged user subscribed to */
 app.get("/user/feeds", auth, function (request, response) {
-	db.getUserWithFeedSummary({login: users[request.cookies.token]})
+	db.getUserWithFeedSummary({login: request.login})
 	.then(function (user) {
 		response.status(200).send(user.subscriptions);
 	}, function (error) {
@@ -103,7 +116,7 @@ app.get("/user/feeds", auth, function (request, response) {
 /* get feed's last stories */
 app.get("\^\/user\/feeds\/*", auth, function (request, response) {
 	var feed_url = decodeURIComponent(request.params[0]);
-	db.getAllArticlesForFeed({login: users[request.cookies.token]}, {xmlUrl: feed_url})
+	db.getAllArticlesForFeed({login: request.login}, {xmlUrl: feed_url})
 	.then(function (data) {
 		if (request.query.filter === "unread") {
 			data = _.filter(data, function (article) { return ! article.read; });
@@ -129,7 +142,7 @@ app.get("\^\/user\/articles\/*", auth, function (request, response) {
 /* mark an article as read */
 app.post("\^\/user\/feeds\/*\/*\/read", auth, function (request, response) {
 	var feed_url = decodeURIComponent(request.params[0]), story_guid = decodeURIComponent(request.params[1]);
-	db.updateReadstate({login: users[request.cookies.token]}, {guid: story_guid}, true)
+	db.updateReadstate({login: request.login}, {guid: story_guid}, true)
 	.then(
 		function (user) {
 			response.status(200).send(user);
@@ -142,7 +155,7 @@ app.post("\^\/user\/feeds\/*\/*\/read", auth, function (request, response) {
 /* mark an article as unread */
 app.post("\^\/user\/feeds\/*\/*\/unread", auth, function (request, response) {
 	var feed_url = decodeURIComponent(request.params[0]), story_guid = decodeURIComponent(request.params[1]);
-	db.updateReadstate({login: users[request.cookies.token]}, {guid: story_guid}, false)
+	db.updateReadstate({login: request.login}, {guid: story_guid}, false)
 	.then(
 		function (user) {
 			response.status(200).send(user);
@@ -190,7 +203,7 @@ app.put("\^\/user\/feeds\/*", auth, function (request, response) {
 	// Make the user subscribe to this feed
 	d.promise.then(
 		function (feed) {
-			db.subscribe({login: users[request.cookies.token]}, {title: feed.title, xmlUrl: feed.xmlUrl})
+			db.subscribe({login: request.login}, {title: feed.title, xmlUrl: feed.xmlUrl})
 			.then(function (user) {
 				response.status(200).send(user);
 			}, function (error) {
@@ -206,7 +219,7 @@ app.put("\^\/user\/feeds\/*", auth, function (request, response) {
 /* cancel a subscription */
 app.delete("\^\/user\/feeds\/*", auth, function (request, response) {
 	var feed_url = decodeURIComponent(request.params[0]);
-	db.unsubscribe({login: users[request.cookies.token]}, {xmlUrl: feed_url})
+	db.unsubscribe({login: request.login}, {xmlUrl: feed_url})
 	.then(
 		function (user) {
 			response.status(200).send(user);

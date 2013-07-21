@@ -97,6 +97,17 @@ Available functions:
 `server.js` provides the REST API, exposed by the back-end.
 This API is JSON-friendly : this means that all request bodies should be encoded as json and `Content-Type` header set to `application/json`.
 
+### Authentication
+
+#### Access token
+
+The authentification is handled by a token given in the `Set-Cookie` header. You must give this token back in the `Cookie`header to get access to a resource.
+Note: this token is valid for one day.
+
+#### HTTP Basic Auth
+
+HTTP Basic Auth mechanism is also supported for each request that needs authentication.
+
 ### CORS
 
 It supports cross origin resource sharing as documented [here](http://www.w3.org/TR/cors/).
